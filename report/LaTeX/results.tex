@@ -1,0 +1,54 @@
+\section{Geometric construction of a classifier}
+As a first experiment a classifier will be constructed geometrically. This is done by computing the average sample for each of the two training Gaussian distributed data sets under consideration. Next the midpoint of the two average points is found. The classification boundary is drawn with at a $\pi/2$ angle to the line connecting the two average points. The result is shown in figure~\ref{fig:initGauss} on the left. A couple of points are misclassified by this approach, which given the statistical nature of the problem must always be allowed. In this case this method produces a decent classifier, this must not be true for other distributions though. If for example many additional samples distributed as shown in figure~\ref{fig:initGauss} on the right are added the method breaks down. This happened because the new samples moved the average and with it the decision boundary. In this new situation a large portion of the blue set is misclassified. 
+Points far from the decision boundary should not influence the classifier like this. This does not happen to this extend if an optimal margin is sought which maximizes the distance of the classifier to each data set if separable or the best possible separation in terms of classification if the data set is not. Figure~\ref{fig:initGaussSvm} illustrates this.
+\begin{figure}
+\input{../src/tikz/initialGauss.tex}
+\input{../src/tikz/initialGaussMod.tex}
+\caption{Geometrical construction of a linear classification line using average values.}
+\label{fig:initGauss}
+\end{figure}
+\begin{figure}
+\input{../src/tikz/initialGaussSvm.tex}
+\input{../src/tikz/initialGaussModSvm.tex}
+\caption{Geometrical construction of a linear classification line using average values.}
+\label{fig:initGaussSvm}
+\end{figure}
+
+\section{Vapnik Support Vector machines}
+At the hart of vapnik's theory is the optimal hyperplane algorithm. In the linear the hyperplane condition is given as\footnote{Support-Vector Networks
+CORINNA CORTES VLADIMIR VAPNIK,Machine Leaming, 20, (1995) page 291 or Least Squares Support Vector Machines, Suykens et al., page 31.}
+\begin{equation}
+y_k [\mathbf{w}^T \mathbf{x}_k + b] \geq 1, \;\; k = 1,\dots,N
+\end{equation}
+With $x_k$ being the input data points and $y_k$ the desired output. Training the machine means finding the high dimensional hyperplane normal vector $w$ and the bias scalar $b$. Normal means here that the dot product with any vector lying in the plane must be zero. Technically a plane is defined by $\mathbf{w}^T(\mathbf{x} - \mathbf{p}) = 0$ but its only interesting here to evaluate the classifier so $b = \mathbf{p}^T \mathbf{w}$ can be used instead and the displacement within the feature space remains unknown.
+The next step is to formulate the optimization problem
+\begin{equation}
+\min_{w,b} \frac{1}{2} \mathbf{w}^T \mathbf{w} \;\text{ such that }\; y_k [\mathbf{w}^T \mathbf{x}_k + b] \geq 1.
+\end{equation}
+Formulating the Lagrange dual, and taking the gradient of $\mathcal{L}(\mathbf{w},b;\alpha)$ with respect to $(\mathbf{w},b)$ leads to a problem in $\alpha$. The lagrange multipliers are called $\alpha$, but in this context they will be called support vectors of the solution. From an optimization point of view, the support vectors are Lagrange multipliers with active set indices. A problem reformulation as
+\begin{equation}
+y_k [\mathbf{w}^T \phi(\mathbf{x}_k) + b] \geq 1
+\end{equation}
+allows for different kernel options. The classifier is given by
+\begin{equation}
+y(\mathbf{x}) = \text{sign}(\sum^N_{k=1} \alpha_k y_k K(\mathbf{x},\mathbf{x}_k) + b).
+\end{equation}
+The following three kernels will be considered here\footnote{Suykens, Data Mining and Neural Networks, Cursustekst page 140.}
+\begin{align}
+K(\mathbf{x},\mathbf{x}_k)  &= \mathbf{x}_k^T \mathbf{x} &\text{  (linear SVM)}, \\
+K(\mathbf{x}, \mathbf{x}_k) &= \exp (-\| \mathbf{x} - \mathbf{x}_k \|^2_2 / \sigma^2) &\text{  (RBF Kernel)}.
+\end{align}
+If the problem is not separable, it means that classification cannot be done without error. In the underlying optimization problem slack variables have to be included in the formulation. 
+
+
+
+\begin{figure}
+\centering
+\includegraphics[width=0.33\linewidth]{../src/figure/svmjsLinSep}
+\includegraphics[width=0.33\linewidth]{../src/figure/svmjsLinRBF}
+\caption{Support vector machine classification of an almost linearly separable problem using a linear and an radial basis function kernel}
+\label{fig:svmjsLinRBF}
+\end{figure}
+
+
+\section{Least Squares Support Vector machines}
