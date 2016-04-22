@@ -1,0 +1,82 @@
+% This file was created by matlab2tikz.
+% Minimal pgfplots version: 1.3
+%
+%The latest updates can be retrieved from
+%  http://www.mathworks.com/matlabcentral/fileexchange/22022-matlab2tikz
+%where you can also make suggestions and rate matlab2tikz.
+%
+\documentclass[tikz]{standalone}
+\usepackage{pgfplots}
+\usepackage{grffile}
+\pgfplotsset{compat=newest}
+\usetikzlibrary{plotmarks}
+\usepackage{amsmath}
+
+\begin{document}
+\definecolor{mycolor1}{rgb}{0.00000,0.44700,0.74100}%
+\definecolor{mycolor2}{rgb}{0.85000,0.32500,0.09800}%
+%
+\begin{tikzpicture}
+
+\begin{axis}[%
+width=1.5in,
+height=1.5in,
+scale only axis,
+xmin=-10,
+xmax=10,
+xlabel={log(gamma)},
+ymin=0,
+ymax=50,
+ylabel={\% miss-classification},
+axis x line*=bottom,
+axis y line*=left
+]
+\addplot [color=mycolor1,solid,mark=*,mark options={solid},forget plot]
+  table[row sep=crcr]{%
+-10	50\\
+-8.94736842105263	50\\
+-7.89473684210526	50\\
+-6.84210526315789	50\\
+-5.78947368421053	50\\
+-4.73684210526316	50\\
+-3.68421052631579	50\\
+-2.63157894736842	50\\
+-1.57894736842105	15\\
+-0.526315789473685	0\\
+0.526315789473685	0\\
+1.57894736842105	0\\
+2.63157894736842	0\\
+3.68421052631579	0\\
+4.73684210526316	0\\
+5.78947368421053	0\\
+6.84210526315789	0\\
+7.89473684210526	5\\
+8.94736842105263	5\\
+10	10\\
+};
+\addplot [color=mycolor2,solid,mark=*,mark options={solid},forget plot]
+  table[row sep=crcr]{%
+-10	33\\
+-8.94736842105263	33\\
+-7.89473684210526	33\\
+-6.84210526315789	33\\
+-5.78947368421053	33\\
+-4.73684210526316	33\\
+-3.68421052631579	33\\
+-2.63157894736842	33\\
+-1.57894736842105	10\\
+-0.526315789473685	5\\
+0.526315789473685	4\\
+1.57894736842105	4\\
+2.63157894736842	3\\
+3.68421052631579	2\\
+4.73684210526316	2\\
+5.78947368421053	2\\
+6.84210526315789	1\\
+7.89473684210526	1\\
+8.94736842105263	1\\
+10	1\\
+};
+\end{axis}
+\end{tikzpicture}%
+\end{document}

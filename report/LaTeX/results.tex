@@ -25,9 +25,9 @@ The next step is to formulate the optimization problem
 \begin{equation}
 \min_{w,b} \frac{1}{2} \mathbf{w}^T \mathbf{w} \;\text{ such that }\; y_k [\mathbf{w}^T \mathbf{x}_k + b] \geq 1.
 \end{equation}
-Formulating the Lagrange dual, and taking the gradient of $\mathcal{L}(\mathbf{w},b;\alpha)$ with respect to $(\mathbf{w},b)$ leads to a problem in $\alpha$. The lagrange multipliers are called $\alpha$, but in this context they will be called support vectors of the solution. From an optimization point of view, the support vectors are Lagrange multipliers with active set indices. A problem reformulation as
+Formulating the Lagrange dual, and taking the gradient of $\mathcal{L}(\mathbf{w},b;\alpha)$ with respect to $(\mathbf{w},b)$ leads to a problem in $\alpha$. The lagrange multipliers are called $\alpha$, but in this context they will be called support vectors of the solution. From an optimization point of view, the support vectors are Lagrange multipliers with active set indices. A problem reformulation using a mapping to a high dimensional feature space $\varphi(\mathbf{x}): \mathbb{R}^n \rightarrow \mathbb{R}^m$ as
 \begin{equation}
-y_k [\mathbf{w}^T \phi(\mathbf{x}_k) + b] \geq 1
+y_k [\mathbf{w}^T \varphi(\mathbf{x}_k) + b] \geq 1
 \end{equation}
 allows for different kernel options. The classifier is given by
 \begin{equation}
@@ -49,12 +49,12 @@ K(\mathbf{x}, \mathbf{x}_k) &= \exp (-\| \mathbf{x} - \mathbf{x}_k \|^2_2 / \sig
 
 If the problem is not separable, it means that classification cannot be done without error. In the underlying optimization problem slack variables have to be included in the formulation:
 \begin{equation}
-y_k [\mathbf{w}^T \mathbf{x}_k + b] \geq 1 - \xi_k
+y_k [\mathbf{w}^T \varphi(\mathbf{x}_k) + b] \geq 1 - \xi_k
 \end{equation}
 Which leads to the optimization problem:
 \begin{align}
-\min_{w,b,\xi} J_p(w,\xi) + c \sum_{k = 1}^N \xi_k \\
-\text{such that }   y_k [\mathbf{w}^T \mathbf{x}_k + b] \geq 1 - \xi_k, \;\; k = 1,\dots,N \\
+\min_{w,b,\xi} J_p(w,\xi) = \frac{1}{2}\mathbf{w}^T\mathbf{w} + c \sum_{k = 1}^N \xi_k \\
+\text{such that }   y_k [\mathbf{w}^T \varphi(\mathbf{x}_k) + b] \geq 1 - \xi_k, \;\; k = 1,\dots,N \\
 \xi_k \geq 0, \;\;\; k = 1,\dots,N 
 \end{align}
 Where $c$ is the positive real miss-classification penalty constant. High values of $c$ make erroneous classification more costly in terms of the merit function.  Low values make those cheaper. Using the \texttt{svmjs}\footnote{\url{http://cs.stanford.edu/people/karpathy/svmjs/demo/}} package the result of using different values of $c$ is illustrated in figure~\ref{fig:c}. Choosing the right value for $c$ is a balancing act. It is important to choose $c$ not too small. As very small values will result in underfitting the problem. The resulting classifier will ignore important features of the problem, as illustrated on the right in figure~\ref{fig:c}. On the other hand however $c$ must also not be too large. If the penalty on incorrect classification is too large the support machine will start to memorize nosy details, as illustrated in figure~\ref{fig:c} on the left. A good choice like the one shown in the middle captures the key points while not falling prey to the noise, while using just as many support vectors as necessary. 
@@ -87,3 +87,60 @@ Like choosing a good $c$ value, when picking $\sigma$ under and over-fitting con
 Figure~\ref{fig:twoNewPoints} illustrates the effect new data points have on the decision boundary. In the right plot two new red points have been added inside of the formerly entirely green region. The decision boundary changes if no additional miss-classification follows from this change. For the new red point close to the green boundary this cannot be done without miss-classifying the green points at the boundary, which therefore has to remain unchanged. 
 
 \section{Least Squares Support Vector machines}
+In contrast to classical support vector machines, their least squares version is defined as\footnote{Least Squares Support Vector Machines, Suykens et al., page 72.}:
+\begin{align}
+\min_{w,b,e} J_p (w,e) &= \frac{1}{2}\mathbf{w}^T\mathbf{w} + \gamma \frac{1}{2} \sum_{k=1}^N e_k^2 \\
+\text{such that } y_k [\mathbf{w}^T \varphi(\mathbf{x_k}) + b] &= 1 - e_k, \; k = 1,\dots,N
+\end{align}
+In comparison to the Vapnik formulation the error variable is squared and the constraint is turned into an equality constraint. After training the dual space classifier
+\begin{equation}
+y(x) = \text{sign}[\sum_{k = 1}^N \alpha_k y_k K(x,x_k) + b]
+\end{equation}
+is obtained. Least squares support vector machines (LSSVM) are an attempt to reduce the computational load for very large data sets. \\
+In a first experiment the iris data set\footnote{\url{http://archive.ics.uci.edu/ml/datasets/Iris}} is used to test the LSSVM algorithm and learn more about the hyper-parameter space it work well in. The challenge here is to differentiate three types of iris plants \textit{Iris Setosa}, \textit{Iris Versicolour} and \textit{Iris Virginica}, based on the leaf dimensions: sepal length [\texttt{cm}], sepal width [\texttt{cm}], petal length [\texttt{cm}], petal width [\texttt{cm}].
+\begin{figure}
+\centering
+\includegraphics[width=0.25\linewidth]{../src/figure/petalSepalUP}
+\input{../src/tikz/irisPetal.tex}
+\input{../src/tikz/irisSepal.tex}
+\caption{Illustration of the difference between petal and sepal flower leafs. As well as an illustration of the data distribution with blue for \textit{Iris-setosa}, red indicating \textit{Iris-versicolor} and yellow \textit{Iris-virginica}.}
+\label{fig:originalIris}
+\end{figure}
+Figure~\ref{fig:originalIris} shows what petal and sepal flower leafs are\footnote{\url{https://en.wikipedia.org/wiki/Sepal}} as well as the data points included in the original iris data set. For a first LSSVM trial run the simplified version shown in figure~\ref{fig:simpleIris} is used. 
+\begin{figure}
+\centering
+\input{../src/tikz/irisSimple.tex}
+\caption{Simplified iris data set, only petal leafs and only two species \textit{Iris-setosa-virginica} and \textit{Versicolor} are considered.}
+\label{fig:simpleIris}
+\end{figure}
+\begin{figure}
+\centering
+\input{../src/tikz/irisLinerKrnl.tex}
+\input{../src/tikz/irisRBFKrnl.tex}
+\input{../src/tikz/irisPolyKrnl.tex}
+\caption{Classification of the simplified iris data set using LSSVMs with different kernels using two classes in each case.}
+\label{fig:linRBFPoly}
+\end{figure}
+Figure~\ref*{fig:linRBFPoly} shows the effect of three kernels on the classification results. As the merged \textit{Setosa-Virginica} data points surround the \textit{Versicolor} measurements there is no way these could be seperated by a simple line. A linear-svm is therefore bound to fail. It comes as no surprise that the linear-kernel did not deliver meaningful results, as shown in figure~\ref{fig:linRBFPoly}. The radial basis function (rbf) and the polynomial kernel are able to cope with the complexity of the problem. The next section will explore which parameter values should be chosen for both kernel types.
+
+\subsection{RBF kernel parameter selection for the iris data set}
+\begin{figure}
+\centering
+\input{../src/tikz/rbfLogSigmaPlot.tex}
+\input{../src/tikz/rbfLogGammaPlot.tex}
+\caption{Miss-classification of test samples versus $\sigma$ and $\gamma$. The test set performance is shown in blue the training set in red.}
+\label{fig:rbfSigmaGamma}
+\end{figure}
+When using a radial basis function kernel the training process depends on the two parameters $\sigma$ and $\gamma$. It was observed earlier that too small values of $\sigma$ lead to over-fitting and too large ones will lead to an oversimplified classifier. This picture is repeated in figure~\ref{fig:rbfSigmaGamma}, on the left. The second parameter $\gamma$  is the regularization parameter. If a small value is chosen minimizing of the complexity of the model is emphasized. For a large $\gamma$ on the other hand, good fitting
+of the training data points is stressed. This leads to a situation where the too large $\gamma$ values cause overfitting and to small ones oversimplification as can be seen in figure~\ref*{fig:rbfSigmaGamma}. 
+
+\subsection{Polynomial kernel parameter selection for the iris data set}
+\begin{figure}
+\centering
+\input{../src/tikz/polyDegreePlot.tex}
+\input{../src/tikz/polyGammaPlot.tex}
+\caption{Miss-classification of test samples versus polynomial degree and $\gamma$. The test set performance is shown in blue the training set in red.}
+\label{fig:ployDegGamma}
+\end{figure}
+Polynomial kernels follow the similar pattern. Figure~\ref*{fig:ployDegGamma} reveals that when one chooses the degree of the kernel polynomial too large the risk of overfitting is high. A degree chosen too small will not capture the problem to its full extent. Gamma behaves with polynomial kernels just like it did with rbf-kernels.  
+
