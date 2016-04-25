@@ -142,5 +142,64 @@ of the training data points is stressed. This leads to a situation where the too
 \caption{Miss-classification of test samples versus polynomial degree and $\gamma$. The test set performance is shown in blue the training set in red.}
 \label{fig:ployDegGamma}
 \end{figure}
-Polynomial kernels follow the similar pattern. Figure~\ref*{fig:ployDegGamma} reveals that when one chooses the degree of the kernel polynomial too large the risk of overfitting is high. A degree chosen too small will not capture the problem to its full extent. Gamma behaves with polynomial kernels just like it did with rbf-kernels.  
+Polynomial kernels follow the similar pattern. Figure~\ref*{fig:ployDegGamma} reveals that when one chooses the degree of the kernel polynomial too large the risk of over-fitting is high. A degree chosen too small will not capture the problem to its full extent. Gamma behaves with polynomial kernels just like it did with rbf-kernels.  
 
+\subsection{The impact of different validation methods}
+In the previous section the importance of avoiding under- or over-fitting became clear. In this section three different validation methods will be compared. The first procedure randomly splits the one-hundred data points of the simplified iris data set into a twenty point validation and a hundred point training data set. Using the training data a svm is trained and then tested on the validation set. The measured miss-classification using this approach for $\gamma \in [10^{-10},10^{10}]$ and $\sigma \in [10^{-2},10^{2}]$ is shown in figure~\ref{fig:classicClass}. \\
+Cross-validation is a methods which attempts to use a data set more efficiently. During $k$-fold-cross-validation the data set is split into $k$ parts. During the $k$ iterations the methods runs each part is set aside for validation once. A classifier is then trained using the remaining data points. The obtained model can then be tested on the validation part. During the next iteration another part will be ignored during training and so on. Cross validation has the added benefit, that each set serves as a validation set once, which hopefully gives a more complete picture of classification performance. 
+Finally the leave one out method uses all data points except for one to train the classifier. The remaining data point can then be used to evaluate the classifier found. In a next iteration another point is ignored the model is retrained and so on. The leave one out methods is the most conservative in terms of validation set size, but also requires the most computational resources as many iterations are required to get a meaningful idea about the classification performance. 
+Figures~\ref{fig:classicClass},~\ref{fig:crossClass} and~\ref{fig:looClass} show the validation results of the three methods using the same parameter ranges. For poor choices of $\sigma$ and $\gamma$, correct classification sinks to about fifty percent, which is as good as classification at random. Generally speaking the 80\% split method is the most data hungry, and it gives an edgy representation of svm performance. Cross validation is more efficient on the data and results are smoother but still follow a similar pattern. The leave one out methods produces an incorrect blue area in the top right for very small $\gamma$ and $\sigma$ values, which does not appear when using other methods. Generally speaking the leave one out methods is suitable for small data-sets due to its computational inefficiency. 
+
+
+\begin{figure}
+\centering
+\input{../src/tikz/8020plot.tex}
+\caption{Miss-classification of validation data using a 80\% training and 20\% validation data ratio.}
+\label{fig:classicClass}
+\input{../src/tikz/crossValidPlot.tex}
+\caption{Miss-classification using ten fold cross-validation.}
+\label{fig:crossClass}
+\input{../src/tikz/leaveOnePlot.tex}
+\caption{Miss-classification using leave one out validation.}
+\label{fig:looClass}
+\end{figure}
+
+\subsection{Automatic tuning}
+Using the ls-svm toolbox'\footnote{\url{http://www.esat.kuleuven.be/sista/lssvmlab/}} \texttt{tunesvm} function automatic hyper-parameter selection is explored. Two algorithm pairs are available. The first pair is coupled simulated annealing or randomized directional search. The optimization function can be a simplex-type method or brute force gridsearch. Finally classification cost can be evaluated using $k$-cross-validation or leave-one-out. When choosing a combination a speed or accuracy trade-off has to be made. The fastest but most unstable combination tried during experiments for this report was the randomized directional search coupled with simplex optimization and cross validation. A histogram showing the $\gamma$ and $\sigma$ values found during fifty training processes is shown in figure~\ref{fig:tuneDsSimplexCrossv}.
+A instead of the randomized directional search coupled simulated annealing can be used. Which is not parallelized but the results if finds are more consistent, as can be seen in figure~\ref{fig:tuneCsaSimplexCrossv}. The most stable algorithm combination in terms of predictability was simulated annealing, grid search, leave-one-out validation combination. A histogram with tuning results is shown in figure~\ref{fig:tuneCsaGridLeave}. Only one of fifty iterations produced a large outlier. 
+
+
+\begin{figure}
+\centering
+\input{../src/tikz/tuneDsSimplexCrossvGamma.tex}
+\input{../src/tikz/tuneDsSimplexCrossvSigma.tex}
+\caption{Histogram of automatically tunned  $\gamma$ and $\sigma$ values using randomized directional search, cross-validation together with simplex-optimization.}
+\label{fig:tuneDsSimplexCrossv}
+\end{figure}
+\begin{figure}
+\centering
+\input{../src/tikz/tuneCsaSimplexCrossvGamma.tex}
+\input{../src/tikz/tuneCsaSimplexCrossvSigma.tex}
+\caption{Histogram of automatically tunned  $\gamma$ and $\sigma$ values using coupled simulated annealing, cross-validation together with simplex-optimization.}
+\label{fig:tuneCsaSimplexCrossv}
+\end{figure}
+
+\begin{figure}
+\centering
+\input{../src/tikz/tuneCsaGridLeaveGamma.tex}
+\input{../src/tikz/tuneCsaGridLeaveSigma.tex}
+\caption{Histogram of automatically tunned  $\gamma$ and $\sigma$ values using coupled simulated annealing, leace-one-out-validation together with a grid search algorithm.}
+\label{fig:tuneCsaGridLeave}
+\end{figure}
+
+\subsection{The ROC-curve}
+
+\begin{figure}
+\centering
+\input{../src/tikz/roc.tex}
+\caption{}
+\label{fig:roc}
+\end{figure}
+
+
+\subsection{Full complexity iris data set classification}
