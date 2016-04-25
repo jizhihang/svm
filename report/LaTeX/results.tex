@@ -192,7 +192,18 @@ A instead of the randomized directional search coupled simulated annealing can b
 \label{fig:tuneCsaGridLeave}
 \end{figure}
 
-\subsection{The ROC-curve}
+\subsection{The roc-curve}
+The receiver operating characteristic (roc)-curve is a way to asses the performance of a binary classifier as its discrimination threshold is varied. Defining\footnote{Least Squares Support Vector Machines, Suykens et al., page 19.}
+\begin{align}
+\text{Sensitivity } &= \frac{\text{TP}}{\text{TP} + \text{FN}} \\ 
+\text{Specifity } &= \frac{\text{TN}}{\text{FP} + \text{TN}} \\
+\text{False pos. rate } &= 1 - \text{Specifity} = \frac{\text{FP}}{\text{FP} + \text{TN}}
+\end{align}
+With TP = \textquotedblleft true positive\textquotedblright,
+ FP = \textquotedblleft false positive\textquotedblright and
+ TN = \textquotedblleft true negative\textquotedblright. The sensitivity is thus the ratio of correctly classified positives over the sum of true positives and false negatives, which is the total number of positive cases that should have been identified as such. Ideally one would aim for a sensitivity of one. Similarly the specificity is the number of true negatives over the total of cases that should have been classified as negative.
+Going trough possible decision threshold values the roc-curve is drawn. The area under the curve describes the efficency of the classifier. If it is one, a perfect classifier has been found, such as the one in figure~\ref{fig:roc}. If the area is one half, the classifier has no added value over classification at random.  
+ 
 
 \begin{figure}
 \centering
@@ -203,3 +214,4 @@ A instead of the randomized directional search coupled simulated annealing can b
 
 
 \subsection{Full complexity iris data set classification}
+There is no reason not to subject least squares support vector machines to the full four dimensional classification problem as seen in figure~\ref{fig:originalIris}. An experiment is done where 30 of the 150 iris plant data points are set aside for validation. The remaining values serve as training data. An svm with $\gamma = 1$ and $\sigma^2 = 1$ did miss-classify only one of 30 validation iris flowers.
