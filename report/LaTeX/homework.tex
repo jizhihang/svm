@@ -1,0 +1,44 @@
+\section{The Ripley Data-Set}
+The ripley data set\footnote{Pattern recognition and Neural Networks B.D. Riplely, Cambridge University press, \url{http://www.stats.ox.ac.uk/pub/PRNN/}} is a well know set used to test machine learning algorithms. The training and validation data are shown in figure~\ref{fig:ripleyVisual}. 
+\begin{figure}
+\centering
+\tikzset{mark size=1}
+\input{../src/tikz/ripleyTrainingWithAvg.tex}
+\input{../src/tikz/ripleyWithAvg.tex}
+\caption{Visualization of the binary classification ripley training and validation data set. The filled dots indicate the position of the average point for each set.}
+\label{fig:ripleyVisual}
+\end{figure}
+A liner and radial basis function kernel will be used to classify the validation data set. Figure~\ref{fig:ripleyLinClass} shows the linear classifier on the training data set and the validation data based roc-curve. In this experiment it was observed that the linear classifier got 16.8\% or 42 of the 250 validation data points wrong. Due to the non-liner nature of the problem the radial basis function kernel was able to outperform its linear counterpart, only 2.4\% or 6 validation data points where incorrect. This perfomance difference is somewhat reflected in the roc curves shown on the right of figures~\ref{fig:ripleyLinClass}~~\ref{fig:ripleyClass}, the curve assosicated with the rbf-svm covers more area and has a lower standard-deviation. 
+
+\begin{figure}
+\centering
+\tikzset{mark size=1}
+\input{../src/tikz/ripleyLinClass.tex}
+\input{../src/tikz/ripleyLinROC.tex}
+\caption{Linear least squares support vector machines visualization and validation based roc curve.}
+\label{fig:ripleyLinClass}
+\input{../src/tikz/ripleyClass.tex}
+\input{../src/tikz/ripleyROC.tex}
+\caption{Radial basis function least squares support vector machines visualization and validation based roc curve.}
+\label{fig:ripleyClass}
+\end{figure}
+
+\section{Breast Cancer Data-set}
+The uci breast cancer set\footnote{\url{http://archive.ics.uci.edu/ml/datasets/Breast+Cancer+Wisconsin+\%28Diagnostic\%29}} contains 596 multidimensional-data points with tissue sample information such as smoothness, compactness, concavity, etc. The data is annotated, with labels indicating healthy or cancerous samples. 400 training and 169 validation measurements are included. Data points have more then 3 dimensions it is this not possible to visualize them using conventional methods. Therefore different classifiers will be trained and evaluated using their roc-curves. The roc-curves of automatically tuned linear and rbf-classifiers are shown in figure~\ref{fig:breastROC}. Both classifiers perform equally well, only around two to five percent of samples is missclassified using automatically tuned machines with either of the two kernels. 
+\begin{figure}
+\input{../src/tikz/breastLinRoc.tex}
+\input{../src/tikz/breastRBFRoc.tex}
+\caption{Linear and radial basis function lssvm classifier roc-curves for the breast-cancer data set.}
+\label{fig:breastROC}
+\end{figure}
+
+\section{Diabetes Database}
+In this example data from a study of diabetes cases among female Pima indians \footnote{\url{http://archive.ics.uci.edu/ml/machine-learning-databases/pima-indians-diabetes/pima-indians-diabetes.names}} is used. The data set consists of 300 training data points and 168 validation samples. Each point consists of information such as the number of past pregnancies, body mass index, plasma glucose concentration and so on. 
+Again for multi-dimensional data sets such as this one visualization is not trivial. Thus classifiers will once more be compared using their roc-curves. A linear and radial basis function svm has been trained. Their roc-plots are shown in figure~\ref{fig:diabetesROC}. 
+\begin{figure}
+\input{../src/tikz/diabetesLin.tex}
+\input{../src/tikz/diabetesRbf.tex}
+\caption{Linear and radial basis function lssvm classifier roc-curves for the diabetes data set.}
+\label{fig:diabetesROC}
+\end{figure}
+Again the two classifiers perform similarly with the linear classifier being correct in 74\% of cases and the radial basis function delivering correct classification in  77.8\% of all validation cases.  
