@@ -1,0 +1,67 @@
+\section{Regression support vector machines.}
+The support vector methodology is not limited to classification problems. \footnote{Support Vector Machines: Methods and Applications, Suykens et al., page 53} In the primal space a model funcion of the form: \footnote{Support Vector Machines: Methods and Applications, Suykens et al., page 54}
+\begin{equation}
+f(\mathbf{x}) = \mathbf{w}^T \varphi(\mathbf{x}) + b 
+\end{equation}
+With annotated training samples $\{x_k,y_k\}$ and a nonlinear mapping $\varphi(\cdot) : \mathbb{R}^n \rightarrow R^{n_h}$, which is only implicitly defined. This definition leads to the primal optimization problem:
+\begin{align}
+\min_{w, b, \xi, \xi^{*}} J_p = \frac{1}{2} \mathbf{w}^T\mathbf{w} + c\sum_{k=1}^{N}(\xi_k + \xi_k^{*}) \\
+\text{such that } y_k - \mathbf{w}^T\varphi(\mathbf{x}_k) - b \leq \epsilon  + \xi_k , k = 1,\dots,N \\ 
+\mathbf{w}^T\varphi(\mathbf{x}_k) - b - y_k \leq \epsilon  + \xi_k^{*} , k = 1,\dots,N \\
+\xi, \xi_k \geq 0 , k = 1,\dots,N
+\end{align}
+After taking and solving the dual the representation
+\begin{equation}
+f(\mathbf{x}) = \sum\limits_{k=1}^{N} (\alpha_k - \alpha_k^{*})K(\mathbf{x},\mathbf{x}_k) + b
+\end{equation}
+of the model is obtained. The $\sigma^2$, $c$ and $\epsilon$ are user parameters, which do not follow from a QP, but should be determined by cross-validation for example. A closer look at $\epsilon$ is taken in figure~\ref{fig:ebfEstEps}. Here $c$ and $\sigma^2 = 0.1$ are kept constant, while $\epsilon$ is varied. In the leftmost plot $\epsilon = 0.1$ is used, then increased to $\epsilon = 0.25$ and finally raised to $\epsilon = 0.5$. Being similar to the $\epsilon$-tube for Lipschitz continuous functions the $\epsilon$-parameter sets up a tube around the original function. In this case the tube is not used for measuring continuity but to set up a tolerance region around a function which leads to the approximation following the data less closely, while at the same time reducing the number of support vectors. 
+\begin{figure}
+\centering
+\input{../src/tikz/rbfS0p1e0p1.tex}
+\input{../src/tikz/rbfS0p1e0p25.tex}
+\input{../src/tikz/rbfS0p1e0p5.tex}
+\caption{RBF kernel based funtion esimation with $\sigma^2 = 0.1$, $\epsilon = 0.1$, $\epsilon = 0.25$ and $\epsilon = 0.5$.}
+\label{fig:ebfEstEps}
+\end{figure}
+\begin{figure}
+\centering
+\input{../src/tikz/linearIsKing.tex}
+\input{../src/tikz/rebfIsPeasant2.tex}
+\caption{On this data set the linear kernel is able to outperform a radial basis function kernel, which is more susceptible to the noisy outliers.}
+\label{fig:linearKing}
+\end{figure}
+Figure~\ref{fig:linearKing} shows an example of an approximately line-like function with some outliers. In this case a simple linear kernel is a good choice, as it is unable to track the added complexity of the noise. An rbf-function kernel is able to integrate the noise into the model, but in this example one would like to avoid this. However it is possible to fundamentally improve the rbf kernel results if changes the parameters $\sigma, c$ and $\epsilon$ are changed more towards regularization. Most notably the parameter $c$, which determines the tolerance for deviation from the desired $\epsilon$-accuracy can be used to improve the performance of the rbf-kernel. If $c$ is set to a comparatively large value with $\epsilon$ kept small results improve. A good choice will use a moderate value for $\epsilon$ to reduce the amount of support vectors and thereby increases the sparsity of the solution vector\footnote{Support Vector Machines: Methods and Applications, Suykens et al., page 33}, while using $c$ to make sure the solution is not to prone to deviations introduced by outliers.
+ 
+\subsection{Sum of cosines}
+As an initial example noise free function:
+\begin{equation}
+f(x) = \cos(x) + \cos(2x)
+\end{equation}
+will be considered. Finding a good set of hyper-parameters by hand can be tricky as figure~\ref{fig:estParamsTricky} illustrates. To make a good choice a hundred by hundred grid in $\sigma^2 \in [10^{-5},10^{0}]$ and $\gamma \in [10^{0},10^{10}]$  has been searched using the two norm of the error vector $(\mathbf{y}_{est} - \mathbf{y})$ as cost function. The error function on the described input space as well as the estimator with the lowest error is shown in figure~\ref{fig:cosEst}. The grid search led to optimal the parameter pair $\sigma^2 = 0.0019$ and $\gamma = 10.2353$. Estimation results are shown in the middle of figure~\ref{fig:cosEst} training set performance is plotted on the left.
+Next a noisy version of $f(x)$ is considered:
+\begin{equation}
+f(x)_n = \cos(x) + \cos(2x) + x_n
+\end{equation}
+With the values for $x_n$ drawn from the normal distribution $\mathcal{N}(0,0.1^2)$. The changed situation is shown in figure~\ref{fig:cosEstNoise}. When noise is added on average the optimal values for $\sigma^2$ must be chosen larger to avoid 
+over-fitting.
+
+\begin{figure}
+\centering
+\input{../src/tikz/twoVariousParams.tex}
+\caption{Estimation results using all combinations of $\sigma^2 \in \{0.0018738, 0.0001\}$ and $\gamma \in \{10.2353 ,10000 \}$ as inputs to function estimation svms.}
+\label{fig:estParamsTricky}
+\end{figure}
+
+\begin{figure}
+\centering
+\input{../src/tikz/twoTrainOpt.tex}
+\input{../src/tikz/twoValOpt.tex}
+\input{../src/tikz/twoGridSearch.tex}
+\caption{Plot of the optimal estimation of the noise-free function $f(x)$. The right plot shows the approximation on training data, the middle one performance on validation data. The blue dots are function values the red crosses show approximation values. Finally the plot on the right shows the explored hyperparameter-space and corresponding two norms of the error vector $(\mathbf{y}_{est} - \mathbf{y})$.}
+\label{fig:cosEst}
+\input{../src/tikz/twoTrainOptNoise.tex}
+\input{../src/tikz/twoValOptNoise.tex}
+\input{../src/tikz/twoGridSearchNoise.tex}
+\caption{Plot of the optimal estimation of the noisy-free function $f_n(x)$. The right plot shows the approximation on training data, the middle one performance on validation data. Finally the plot on the right shows the hyper-parameter-space and corresponding two norms of the error vector $(\mathbf{y}_{est} - \mathbf{y})$.}
+\label{fig:cosEstNoise}
+\end{figure}
