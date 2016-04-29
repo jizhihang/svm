@@ -56,6 +56,24 @@ Figure~\ref{fig:AIDBayes} shows three different random inputs, while the first o
 Input selection can also be done using a layered cross-validation approach. On way to do it is eliminate one input from the data and compute the value of the cross-validation mean squared error. If each input is neglected once the most important one will be the input for which the cost rose most when eliminated. In this example the cost values $1.2928, 1.0031,  1.0083$ where found when the first, second, and third input where eliminated. It can be concluded that the first input is the most important is its absence leads to higher cost as if any of the other inputs are missing. Another method is to only keep the input in question, in this case the cost values $0.5132, 1.2910, 1.2578$ where found. This confirms what was found earlier. 
 
 \subsection{Robust Regression}
-
-
-
+In order to make svm regression more robust with respect to outliers in the data, a weighted approach is used.\footnote{Support Vector Machines: Methods and Applications, Suykens et al., page 154} The primal optimization problem is slightly modified:
+\begin{equation}
+\min\limits_{\mathbf{w}^*,b^*,e^*} J_p (\mathbf{w}^*,e^*) = \frac{1}{2} \mathbf{w}^{T^*}\mathbf{w} + \gamma \frac{1}{2}\sum\limits_{k = 1}^{N} v_k e_k^{*2}
+\end{equation}
+Using the weight function\footnote{Support Vector Machines: Methods and Applications, Suykens et al., page 155}
+\begin{align}
+v_k = \begin{cases}
+      	1, & \text{if }  |e_k / \hat{s} | \leq c_1 \\
+      	\frac{c_2 - |e_k / \hat{s} | }{c_2 - c_1 }, &  c_1 \leq \text{if } |e_k / \hat{s} | \leq c_2 \\
+      	10^{-4}, & \text{otherwise}
+      \end{cases}.
+\end{align} 
+The constants $c_1$ and $c_2$ are typically chosen as $c_1 = 2.5$ and $c_2 = 3$ in the literature. \footnote{Support Vector Machines: Methods and Applications, Suykens et al., page 155} Finally $\hat{s}$ must be a robust estimate of the standard deviation and $e_k$ is given as $e_k = \alpha_k / \gamma$.  
+\begin{figure}
+\centering
+\input{../src/tikz/fiveClassic.tex}
+\input{../src/tikz/fiveWhuber.tex}
+\caption{Standard svm estimation and its robust version using Huber weights.}
+\label{fig:robustSVM}
+\end{figure}
+Figure~\ref{fig:robustSVM} shows the difference between the standard approach and the more robust weighted one, which handles the noise better. Other weight functions such as logistic- or hampel-weights perform similarly.
