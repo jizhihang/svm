@@ -1,15 +1,34 @@
 \subsection{Hyper-parameter tuning}
-Just like it was possible to automatically search the hyper-parameter space for good tuning parameters in the classification setting, it is possible in the function estimation case. 
-
-
+Just like it was possible to automatically search the hyper-parameter space for good tuning parameters in the classification setting, it is possible in the function estimation case. One option is certainly to use a brute fore grid based approach. Figure~\ref{fig:logGridCost} shows the cost function within the space $\sigma^2 \in \{0.0018738, 0.0001\}$ and $\gamma \in \{1.0, 10.2353 ,10000 \}$ on a hundred by hundred grid. The cost function $\log_{10}(\| \mathbf{y}_{\text{est}} - \mathbf{y}\|_2)$ is shown logarithmically on the z-axis. The plot reveals that this problem might not be convex. Several possible local minima exist where a pure gradient based optimization approach could get stuck. Therefore a global optimization method is needed as a remedy, locally standard methods like the simplex method can be employed.  In a first experiment the global optimization algorithm Coupled Simulated Annealing and local simplex-optimization are used. If noise is present the optimization algorithm must choose the regularization constant smaller to stress model complexity reduction. If no noise is present good fit of the model can be stressed, as can be seen in figure~\ref{fig:autoTune}. 
 \begin{figure}
 \centering
-\input{../src/tikz/threeAutoNoise.tex}
 \input{../src/tikz/threeAutoNoNoise.tex}
+\input{../src/tikz/threeAutoNoise.tex}
 \caption{Exemplary tuning results on noise free and noisy data.}
 \label{fig:autoTune}
 \end{figure}
+\begin{figure}
+\centering
+\input{../src/tikz/gridErrLog.tex}
+\caption{A 3d logarithmically scaled plot of the cost in the hyper-parameter space of the noisy function estimation problem.}
+\label{fig:logGridCost}
+\end{figure}
 
-\subsection{The Bayesian Framework}
-
-\subsection{Robust Regression}
+\begin{table}
+\centering
+\begin{tabular}{|c|c c|} \hline
+		&	csa & ds	\\ \hline
+simplex &	0.6765	& 0.5944	\\
+grid 	&	0.9788	& 0.9062	\\ \hline
+\end{tabular}
+\caption{Average time of a single tuning function execution. The average was computed from running each combination ten times on the noisy cosine function estimation problem.}
+\label{tab:tuneTime}
+\begin{tabular}{|c|c c|} \hline
+		&	csa & ds	\\ \hline
+simplex &	0.0018	& 0.0019	\\
+grid 	&	0.0019	& 0.0018	\\ \hline
+\end{tabular}
+\caption{Average cross-validation-cost of a the parameters found by the tabulated algorithm combinations. Ten folds have been used for cross validation and the mean squared error served as cost function.}
+\label{tab:tuneError}
+\end{table}
+Table~\ref{tab:tuneTime} shows the average time of 10 different tuning function runs. It can be said that simplex optimization is faster then a grid based approach and randomized directional search is faster then simulated annealing (if the startup time of the parallel pool is neglected). In terms of accuracy of the found solution no significant differences could be found on average, see table~\ref{tab:tuneError}. Which means that all method combinations find good parameters in this case in general.

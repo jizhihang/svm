@@ -1,0 +1,61 @@
+\subsection{The Bayesian Framework}
+Bayesian inference is a layered process. For classification the modified primal problem,
+\begin{align}
+\min\limits_{w,b,e_c} J_p (w,e_c) = \mu \frac{1}{2}\mathbf{w}^T\mathbf{w} + \zeta \frac{1}{2} \sum\limits_{k = 1}^{N} e^2_{c,k} \\
+\text{such that } y_k [\mathbf{w}^T \varphi(\mathbf{x}_k) + b] = 1 - e_{c,k}, k = 1, \dots, N 
+\end{align}
+is used which eventually leads to the dual space classifier\footnote{Support Vector Machines: Methods and Applications, Suykens et al., page 119}
+\begin{align}
+y(x) = \text{sign}[\frac{1}{\mu} \sum\limits_{k=1}^{N}\alpha_k K(x,x_k) + b]
+\end{align} 
+It follows that the primal weight space parameters $w,b$ the hyper-parameters $\mu,\zeta$ and finally the kernel parameters (if any) have to be determined. The hyper-parameters $\mu,\zeta$ are a different way to express $\gamma$, which was used in previous formulations. The relation $\gamma = \frac{\zeta}{\mu}$ holds \footnote{Support Vector Machines: Methods and Applications, Suykens et al., page 118}, which can be checked by substituting $\mu = 1$.
+The unknowns will be found following a three layered process. The first layer focuses on the weight vector and the bias terms defining $\mathcal{D} = \{x_k,y_k\}^N_{k = 1}$ and using $\mathcal{H}_{i}$ to denote different models i.e. radial basis function kernels with different width. The first level uses the equation:\footnote{Support Vector Machines: Methods and Applications, Suykens et al., page 122}
+\begin{equation}
+p(\mathbf{w},b|\mathcal{D},\mu,\zeta,\mathcal{H}_\sigma) = \frac{p(\mathcal{D}|\mathbf{w},b,\mu,\zeta,\mathcal{H}_\sigma)}{p(\mathcal{D}|\mu,\zeta,\mathcal{H}_\sigma)} p(\mathbf{w},b|\mu,\zeta,\mathcal{H}_\sigma)
+\end{equation}
+With $p(\mathcal{D}|\mu,\zeta,\mathcal{H}_\sigma)$ denoting the evidence which is determined by integrating over all possible values of $\mathbf{w},b$ and normalizing the result. $\mathbf{w},b$ follow from the first level, which is then used in the second layer to find $\mu$ and $\zeta$ by maximizing:
+\begin{equation}
+p(\mu,\zeta|\mathcal{D},\mathcal{H}_\sigma) = \frac{p(\mathcal{D}|\mu,\zeta,\mathcal{H}_\sigma)}{p(\mathcal{D}|\mathcal{H}_\sigma)} p(\mu,\zeta|\mathcal{H}_\sigma). 
+\end{equation}
+Which leads to the lowest third level where the kernel parameters are found:
+\begin{equation}
+p(\mathcal{H}_\sigma|\mathcal{D}) = \frac{p(\mathcal{D}|\mathcal{H}_\sigma)}{p(\mathcal{D})} p(\mathcal{H}_\sigma).
+\end{equation}
+For function estimation the picture is similar, but a couple of small modifications have to be made. For example assuming a hyper-parameter vector $\zeta_{1\dots N} = [\zeta_1,\dots,\zeta_N]$.
+Using Bayesian inference also makes it possible to compute error bounds. The model found from the initial parameters $\sigma^2 = 0.01$, $\gamma = 10$ is shown in figure~\ref{fig:bayesianInf}. It is not perfect but all training points lie indeed inside the confidence interval. Choosing an initial point closer to the global optimum will probably results in better parameters $\sigma$ and $\gamma$. \\
+A good example for binary classification is the simplified iris data set. Using bayesian inference the posterior class probabilities can be estimated. This has been done for a classifier trained using $\gamma = 5$ and $\sigma^2 = 0.75$. The result is shown in figure~\ref{fig:bayesianClass}. The purple indicates that the classifier will place points in this area in the positive class, while data in the blue area will be placed in the negative class. Like it was observed earlier the regularization parameter reduces model complexity for low values and stresses good fit to the data for high values. The kernel density on the other hand stresses fit for small values and model complexity reduction for larger widths. \\
+\begin{figure}
+\centering
+\includegraphics[width=0.25\linewidth]{../src/figure/bayesianInf}
+\caption{Bayesian inference schematic.}
+\label{fig:bayesianInf}
+\end{figure}
+\begin{figure}
+\centering
+%\input{../src/tikz/fourEstTrainPlot.tex}
+\input{../src/tikz/fourEstTrainWBounds.tex}
+\caption{Function estimation with parameters from Baysean inference and confidence bounds.}
+\label{fig:bayesianInfWconf}
+\end{figure}
+\begin{figure}
+\centering
+\input{../src/tikz/fourClass.tex}
+\caption{Posterior class probabilities of an iris data classification svm}
+\label{fig:bayesianClass}
+\end{figure}
+Bayesian inference can also be used for input relevance detection. This is done using radial basis function kernels with a different width for each kernel on the third level of inference. Inputs which end up with small kernel width are successively removed as small density is a strong indication for data memorization. 
+\begin{figure}
+\centering
+\input{../src/tikz/fourInX1.tex}
+\input{../src/tikz/fourInX2.tex}
+\input{../src/tikz/fourInX3.tex}
+\caption{Plots of three different input sequences and their corresponding output value. With the generating function overlaid.}
+\label{fig:AIDBayes}
+\end{figure}
+Figure~\ref{fig:AIDBayes} shows three different random inputs, while the first one was used to compute the noisy target function $f_n$. Clearly it is the most relevant input. And Baysian inference comes to the same conclusion.
+Input selection can also be done using a layered cross-validation approach. On way to do it is eliminate one input from the data and compute the value of the cross-validation mean squared error. If each input is neglected once the most important one will be the input for which the cost rose most when eliminated. In this example the cost values $1.2928, 1.0031,  1.0083$ where found when the first, second, and third input where eliminated. It can be concluded that the first input is the most important is its absence leads to higher cost as if any of the other inputs are missing. Another method is to only keep the input in question, in this case the cost values $0.5132, 1.2910, 1.2578$ where found. This confirms what was found earlier. 
+
+\subsection{Robust Regression}
+
+
+
