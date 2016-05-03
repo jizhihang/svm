@@ -1,3 +1,40 @@
-\section{Time series prediction}
+\section{Santa Fe laser Time series prediction}
+The santa fe laser competition data stems from a 1989 paper, physicists measured the intensity of a unidirectional far infrared $NH_3$ laser\footnote{U. H\"{u}bner et al, Dimensions and entropies of chaotic intensity pulsations in a single-mode far-infrared NH3 laser, \url{http://journals.aps.org/pra/pdf/10.1103/PhysRevA.40.6354}}. In physics these types of lasers are modeled using so called Lorenz-Haken models. These models are chaotic systems, whith their Lyapunov exponent determining the speed by which trajectories starting a similar initial conditions diverge. In practice the quality any approximaiton made using Lorenz-Haken models depends on the of the initial conditions and the constants used in the model. 
+\begin{figure}
+\centering
+\includegraphics[scale = 0.25]{../src/figure/origPaper.png}
+\input{../src/tikz/hwFullDataSet.tex}
+\caption{Data set measured by H\"{u}bner et al. and the subset selected for the Santa Fe competition.}
+\label{fig:origAndSel}
+\end{figure}
+Figure~\ref{fig:origAndSel} shows a screenshot from the original paper and a plot of part of the measurements selected for the santa-fe competition. Instead of trying to figure out a good initial condition as well as reliable parameters for a Lorenz-Haken model a ls-svm in recurrent mode will be used to model this problem.
+In the autonomous case of a recurrent model;
+\begin{equation}
+\hat{y}_k = f(\hat{y}_{k-1}, \hat{y}_{k-2}, \hat{y}_{k-3}, \dots)
+\end{equation} 
+a recurrent support vector machine can be used to model the system dynamics, given a starting value and windowed training data. Windowing the data means placing it into a Hankel matrix, where the rows represent shifted versions of the input. The ls-svm approach then uses the optimization problem: \footnote{Support Vector Machines: Methods and Applications, Suykens et al., page 225}
+\begin{align}
+\min\limits_{\mathbf{w},b,e} J_p(\mathbf{w},e) &= \frac{1}{2}\mathbf{w}^T \mathbf{w} + \gamma \frac{1}{2}\sum\limits_{k = p+1}^{p+N} e_k^2 \\
+\text{such that } y_k - e_k &= \mathbf{w}^T \varphi(y_{k-1_k-p} - e_{k-1_k-p}) + b \;\;\; k = k \dots N.
+\end{align}
+The problem states that the approximation error $e_k  = y_k - \hat{y}_k$ should be reduced while enforcing the recurrent model dynamics. \\
+\begin{figure}
+\centering
+\input{../src/tikz/hwautocorr.tex}
+\caption{Autocorrelation analysis of the training time-series shown with 95\% confidence bounds.}
+\label{fig:santaFeAutocorr}
+\end{figure}
+In order to choose the window size the sample autocorrelation function shown in figure~\ref{fig:santaFeAutocorr} is considered. In the plot the autocorrelation values start to come close to the confidence bounds around a lag of fifty samples. Therefore a window size of fifty will be used as this shift covers the most significant samples. \\
+\begin{figure}
+\centering
+\tikzset{mark size=1}
+\input{../src/tikz/hwPredOneSvmWerror2.tex}
+\input{../src/tikz/hwPredOneSvmWerror3_75p5_27p7.tex}
+\caption{Recurrent ls-svm approxmation of scaled Santa-Fee using the automatically found hyper-parameters $\gamma =  158.5795, \sigma^2 = 23.35559$ (top) and $\gamma = 75.4764, \sigma^2 = 27.7826$ (bottom) . The blue curve shows the validation data set, the red one the svm-approximation. Yellow dots indicate the error at any given point.}
+\label{fig:santaFe}
+\end{figure}
+ Figure~\ref{fig:santaFe} shows recurrent svm approximation using automatically tuned hyper-parameters found trough a coupled simulated annealing, simplex optimization algorithm pair. Cross-validation was used in order to evaluate the  absolute error cost function. Results using this cost function have been significantly better then using a mean square error function or infinity norm based cost.   
+      
 
-\subsection{Santa Fe laser dataset}
+
+\section{Changing window committee nets.}
