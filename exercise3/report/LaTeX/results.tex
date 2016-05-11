@@ -1,0 +1,94 @@
+\section{Kernel principle component analysis}
+Linear component analysis works by finding the main axes which describe a given data set best. Linear combinations of these principal component vectors can then be used to recreate each point in the original data set. In practice linear PCA operates on the mean:
+\begin{equation}
+\bar{\mathbf{x}} = \frac{1}{N} \sum\limits_{k = 1}^{N} \mathbf{x}_k . 
+\end{equation}
+Next from each data point's deviation from the mean the covariance matrix is computed:\footnote{Support Vector Machines: Methods and Applications, Suykens et al., page 20}
+\begin{equation}
+\Sigma = \frac{1}{N - 1} \sum\limits_{k = 1}^{N} (\mathbf{x}_k - \bar{\mathbf{x}})(\mathbf{x}_k - \bar{\mathbf{x}})^T
+\end{equation}
+The linear principle components are defined to be the eigenvectors $\mathbf{u}$ of the covariance matrix $\Sigma$;
+\begin{equation}
+\Sigma \mathbf{u} = \lambda \mathbf{u}. 
+\end{equation}
+If the eigenvectors are stored in a matrix $U$,
+\begin{equation}
+\mathbf{x} = \bar{\mathbf{x}} + \mathbf{U}\mathbf{b}
+\end{equation}
+can be used to recombine the prinipal components to match points close to the original data set. By enforcing limits on the weight vector $\mathbf{b}$ the closeness of remaps to the original data can be controlled.  \footnote{Active Shape Models - Their training and Application, Cootes et al, pages 43,44 and 49}
+Another important application of linear PCA is dimensionality reduction. An reduction of input dimension is achieved by considering the remapped data,
+\begin{equation}
+\mathbf{z}_i = \mathbf{u}_i^T (\mathbf{x} - \bar{\mathbf{x}}_i) \;\; i = 1,\dots,m.
+\end{equation}
+With $m < N$, the dimension is reduced by neglecting the smallest eigenvalues and their corresponding eigenvectors. This method allows to reduce the input data complexity, while keeping the information loss as small as possible. 
+\begin{figure}
+\centering
+\input{../src/tikz/pca.tex}
+\input{../src/tikz/kpca.tex}
+\caption{Linear PCA showing two principal components(left) and kernel PCA (right) .
+		 The mean sample value $\bar{\mathbf{x}}$ is indicated by a square at $(0,0)$ in both plots.}
+\label{fig:PCA}
+\end{figure}
+Figure~\ref{fig:PCA} shows a classical coordinate system consisting of the principal axes centered at the mean. The data set under consideration is nonlinear, therefore the linear approach fails to capture essential information present in the data. 
+
+On the right of figure~\ref{fig:PCA} the result of using a non-linear approach is shown. The kernel-PCA is able to track the nonlinear lines despite the presence of progressively increasing noise.
+The linear PCA can also be formulated as an optimization problem \footnote{Support Vector Machines: Methods and Applications, Suykens et al., page 202}:
+\begin{equation}
+\max\limits_{\mathbf{w}} \text{Var}(\mathbf{w}^T\mathbf{x}) = \text{Cov}(\mathbf{w}^T\mathbf{x}, \mathbf{w}^T\mathbf{x}) \simeq \mathbf{w}^T C \mathbf{w}
+\end{equation} 
+which is valid, when considering zero mean data and using $\mathbf{C} = \frac{1}{N}\sum_{k=1}^{N} \mathbf{x}_k \mathbf{x}_k^T $. Taking into account the constraint $\mathbf{w}^T \mathbf{w} = 1$ leads to the Lagrangian:
+\begin{equation}
+\mathcal{L}(w; \lambda) = \frac{1}{2}\mathbf{w}^T\mathbf{C}\mathbf{w} - \lambda (\mathbf{w}^T \mathbf{w} - 1) 
+\end{equation}
+The solution of the problem will be found where the gradient of the Lagrangian is zero $\bigtriangledown \mathcal{L} = 0$. Using this equation yields the eigenvalue problem,
+\begin{equation}
+\mathbf{C}\mathbf{w} = \lambda \mathbf{w}.
+\end{equation}
+Which can be solved as discussed before. The kernel case is an extension of the linear case \footnote{Support Vector Machines: Methods and Applications, Suykens et al., page 211} the mean equivalent is defined by,
+\begin{equation}
+\hat{\mu} = \frac{1}{N} \sum\limits_{k=1}^{N} \varphi(\mathbf{x}_k).
+\end{equation}
+The ls-svm approach to the problem looks at:
+\begin{align}
+\max\limits_{\mathbf{w},\mathbf{e}} J_p(\mathbf{w},\mathbf{e}) &= \gamma \frac{1}{2}\sum\limits_{k=1}^{N} e_k^2 - \frac{1}{2}\mathbf{w}^T\mathbf{w} \\
+\text{such that } e_k &= \mathbf{w}^T (\varphi(\mathbf{x_k} - \hat{\mu})), \;\; k = 1,\dots,N
+\end{align}
+Trough an analysis of the optimality conditions once more an equivalent eigenvalue problem can be found,
+\begin{equation}
+\Omega_c \alpha = \lambda \alpha.
+\end{equation} 
+With $\lambda = \frac{1}{\gamma}$ and $\alpha_k = \gamma e_k$. And the kernel matrix defined by,
+\begin{equation}
+\Omega_{c; k,l} = (\varphi(\mathbf{x}_k) - \hat{\mu})^T (\varphi(\mathbf{x}_l) - \hat{\mu}).
+\end{equation}
+Which can be found by using the Kernel trick, after that the analysis can proceed like it did in the linear case. The projected space is given by:
+\begin{equation}
+z(\mathbf{x}) = \mathbf{w}^T(\varphi(\mathbf{x}) - \hat{\mu}).
+\end{equation}
+This space is also called target space an is interpreted as en error where the target is zero. A plot of the kernel matrix eigenvalues associated with the toy-problem under consideration is shown in figure~\ref{fig:toyEig}. The plots in~\ref{fig:toyProj} show the  projections of the kernel matrix onto the first six principal components. It can be observed that the projection quality decreases alongside the relevance of the associated eigenvalue.
+\begin{figure}
+\centering
+\input{../src/tikz/lam6.tex}
+\caption{Plot of the first six eigenvalues of the centered kernel matrix.}
+\label{fig:toyEig}
+\end{figure}
+\begin{figure}
+\centering
+\input{../src/tikz/pca1.tex}
+\input{../src/tikz/pca2.tex}
+\input{../src/tikz/pca3.tex}
+\input{../src/tikz/pca4.tex}
+\input{../src/tikz/pca5.tex}
+\input{../src/tikz/pca6.tex}
+\caption{Plots of the kernel matrix projections using each of the six computed principal components. The quality of the plots decreases together with the relative importance of the associated eigenvalue.  }
+\label{fig:toyProj}
+\end{figure}
+The actual de-noising is done using:
+\begin{equation}
+\bar{\mathbf{x}} = h(z)
+\end{equation}
+Where the function $h$ must minimize:
+\begin{equation}
+\min \sum\limits_{k=1}^{N} \| \mathbf{x}_k - h(z_k)\|^2.
+\end{equation} 
+The function $h$ is generally an MLP trained using Bayesian learning. \footnote{Support Vector Machines: Methods and Applications, Suykens et al., page 213} But solving an the unconstrained optimization problem using a specified kernel function is also possible.  
