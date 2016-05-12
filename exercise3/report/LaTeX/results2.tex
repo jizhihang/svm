@@ -22,6 +22,30 @@ In the non-linear case the rbf-kernel-function density is initialized using the 
 \end{figure}
 The miss-representation of the number seven in the can be fixed by increasing the rbf-kernel width, the result is shown in figure~\ref{fig:denoiseKerLargSigm}. Unfortunately increasing the width also increases the noise, so a good trade off is required. 
 
-
-
 \section{Spectral clustering}
+In this section a problem consisting of two interlocked rings as shown in figure~\ref{fig:interlock} will be analyzed. Two the human eye the grouping of points into two independent rings is immediately apparent. Spectral clustering is an algorithm, with which a computer can find these two classes. As the data set does not have annotations, this is an unsupervised learning algorithm. Spectral clustering methods use a kernel function as a similarity measure. The largest eigenvectors of a rescaled kernel-matrix are computed. The eigenvectors corresponding to the three largest eigenvalues are computed the second largest will contain the clustering information in the sign. If more then three eigenvectors are found the one containing the clustering information will be the smallest with an even number, if one starts counting with one at the largest vector. It must be noted that in this case the eigenvalues are all very close to one, so this observation cannot necessarily be generalized.  Figure~\ref{fig:clusteringResults} shows the results of using classification information from the second largest eigenvector when computing the first three eigenvectors using lanczos' iterative method. It can be observed that for the two smaller values $\sigma^2 = 0.001$ and $\sigma^2 = 0.01$ the method is able classify the two rings correctly. For the larger value $\sigma^2 = 0.1$ the rbf-kernel becomes to large, which results in incorrect linear looking classification.  
+
+\begin{figure}
+\centering
+\input{../src/tikz/spectralClustering.tex}
+\caption{The training data set consisting of two interlocked rings.}
+\label{fig:interlock}
+\end{figure}
+
+
+
+\begin{figure}
+\centering
+\input{../src/tikz/spectralClusteringResult0.001.tex}
+\input{../src/tikz/spectralClusteringSpace0.001}
+\caption{Spectral clustering and subspace projections using $\sigma^2 = 0.001$.}
+\input{../src/tikz/spectralClusteringResult0.01.tex}
+\input{../src/tikz/spectralClusteringSpace0.01}
+\caption{Spectral clustering and subspace projections using $\sigma^2 = 0.01$.}
+\input{../src/tikz/spectralClusteringResult0.1.tex}
+\input{../src/tikz/spectralClusteringSpace0.1}
+\caption{Spectral clustering and subspace projections using $\sigma^2 = 0.1$.}
+\label{fig:clusteringResults}
+\end{figure}
+
+
