@@ -29,6 +29,10 @@ window = [15,20,25];
 [process_matrix_err,process_matrix_sv,process_matrix_time] = ...
     fslssvm(X,Y,k,function_type,kernel_type,global_opt,user_process,window,testX,testY);
 
+
+%% save
+save('brData.mat','process_matrix_err','process_matrix_sv','process_matrix_time')
+
 if 0
     label_process = user_process(1:length(user_process)-1);
     
