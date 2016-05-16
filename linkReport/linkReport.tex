@@ -1,0 +1,29 @@
+
+\input{./src/preamble.tex}
+\addto\captionsenglish{\renewcommand{\chaptername}{Session}}
+
+\begin{document}
+\input{./src/Masterproef_EN_2012.tex}
+ 
+\tableofcontents
+\setcounter{page}{0}
+\pagenumbering{arabic}
+
+\chapter{Classification}
+\subimport{../exercise1/report/LaTeX/}{results.tex}
+\subimport{../exercise1/report/LaTeX/}{homework.tex}
+
+\chapter{Function Estimation and Time-series Prediction}
+\subimport{../exercise2/report/LaTeX/}{results.tex}
+\subimport{../exercise2/report/LaTeX/}{results2.tex}
+\subimport{../exercise2/report/LaTeX/}{results3.tex}
+\subimport{../exercise2/report/LaTeX/}{homework.tex}
+
+\chapter{Unsupervised Learning and sparsity}
+\subimport{../exercise3/report/LaTeX/}{results.tex}
+\subimport{../exercise3/report/LaTeX/}{results2.tex}
+\subimport{../exercise3/report/LaTeX/}{results3.tex}
+\subimport{../exercise3/report/LaTeX/}{homework.tex}
+
+
+\end{document}
