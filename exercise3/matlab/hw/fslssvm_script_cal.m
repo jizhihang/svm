@@ -32,7 +32,7 @@ window = [15,20,25];
 
 
 %% save
-save('shuttleData.mat','process_matrix_err','process_matrix_sv','process_matrix_time')
+save('shuttleCal.mat','process_matrix_err','process_matrix_sv','process_matrix_time')
 
 if 0
     label_process = user_process(1:length(user_process)-1);
