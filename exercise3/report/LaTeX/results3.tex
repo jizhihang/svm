@@ -1,1 +1,45 @@
 \section{Fixed-size LS-SVM}
+As the number of data points increases working in the dual space becomes harder and harder, because the dimension of the unknown support vectors depends on the number of input data points $\alpha \in \mathcal{R}^N$. The primal problem is better suited for many input data points as the unknown primal weights vector length is determined by the dimension of the input data $\mathbf{w} \in \mathcal{R}^n$. In other words large data set problems should be solved in the primal space, while the dual space should be used if the input data is high dimensional. \footnote{Support Vector Machines: Methods and Applications, Suykens et al., page 174}
+When SVMs are trained in the primal space, they are called fixed size svms. For the primal space case the kernel trick made it possible to train svms without explicitly knowing which non-linear function mapped to the feature space. When working in the primal space $\varphi(\mathbf{x})$ must be evaluated. This is only simple for linear classifiers, where $\varphi(\mathbf{x}) = \mathbf{x}$. In the non-linear case the Nystr\"{o}m method is required to approximate the nonlinear mapping $\varphi(\mathbf{x})$, the general idea is to choose a a fixed subsampled kernel matrix size $M$. Typically $M$ is a lot smaller then the true Kernel-matrix size $M \ll N$\footnote{Support Vector Machines: Methods and Applications, Suykens et al., page 175}  
+This smaller kernel matrix is then approximated using a subset of the input data. The computed eigenvalues and eigenvector found from this set are then used as an approximation to the true large version of the matrix. 
+Instead of choosing these support vectors randomly the entropy function,\footnote{Support Vector Machines: Methods and Applications, Suykens et al., page 181} 
+\begin{align}
+H_r = = - \log\int p(\mathbf{x})^2 d\mathbf{x} \\
+\int p(\mathbf{x})^2 d\mathbf{x} = \frac{1}{N^2} \mathbf{1}^T \Omega \mathbf{1}
+\end{align}
+is used. Starting from a random fixed size pool of support vectors a selected vector is replace with a value from the training set. If the entropy increases the datum is kept in the support vector set. If the entropy function does not increase the new value is rejected and the old one is kept in the set. This procedure is repeated until the entropy function does int increase sufficiently anymore or a maximum number of iteration is reached. The reduced kernel matrix can be determined from the fixed set. After estimating its eigenfunction $\mathbf{w}$ and $b$ are determined.
+\begin{figure}
+\centering
+\input{../src/tikz/entropyFun.tex}
+\caption{The value of the entropy function for an optimization process of a subset of 10 values drawn from the normal distribution $\mathcal{N}(0,2^2)$}
+\label{fig:normalEntropy}
+\end{figure}
+Figure~\ref{fig:normalEntropy} shows the entropy function over hundred iterations of a ten vector subset from a normally distributed data-set. 
+\begin{figure}
+\input{../src/tikz/featureSpaceReconstruction.tex}
+\caption{Feature space reconstruction}
+\label{fig:featureReconstr}
+\end{figure}
+Given this optimized subset the nonlinear mapping can be approximated as shown in figure~\ref{fig:featureReconstr} using the Nystr\"{o}m method, if alongside the selected inputs a kernel function and its parameters are chosen. 
+
+\subsection{Sparsity and the $l_0$-norm}
+\begin{figure}
+\centering
+\input{../src/tikz/brError.tex}
+\input{../src/tikz/brSV.tex}
+\input{../src/tikz/brTime.tex}
+\caption{Classical fixed size svm and $l_0$ reduced version comparison for classification on the Wisconsin breast cancer dataset.}
+\label{fig:brl0}
+\end{figure}
+Sparsity is a desirable property of trained support vector machines. In the dual space an ls-svm classifier is sparse if many support vectors are zero. \footnote{Support Vector Machines: Methods and Applications, Suykens et al., page 33} When evaluating the classifier only the non-zero vectors have to be taken into account, making the computation more efficient. For fixed size ls-svms the primal problem is considered, the notion of sparsity translates into a smaller representation of the basis given by:
+\begin{equation}
+\mathbf{w} = \sum\limits_{N}^{k = 1} \alpha_k \varphi(\mathbf{x}_k)
+\end{equation}
+A good method of determining suitable subset of the input space $\{\varphi(\mathbf{x}_k)\}_{k = 1}^N$, could for example be the entropy selection method discussed earlier. The determined subset could then serve as a way to approximate a sparse $\mathbf{w}$. This goal is formulated using the $l_0$ norm
+\begin{equation}
+\min\limits_{\mathbf{w}} \| \mathbf{w} \|_0 = \|w_1 \|^0 + \|w_2 \|^0 + \dots +\|w_N \|^0 
+\end{equation}
+which is equivalent to minimizing the count of non-zero elements in the vector.\footnote{David Wipf and Bhaskar Rao, $l_0$-norm Minimization for Basis Selection}
+A first experiment using this method of producing sparsity is use for classification of the comparatively small Wisconsin data set. Results from running \texttt{fslssvm\_script} are shown in figure~\ref{fig:brl0}. The error comparison shows a slightly elevated median for the sparse version, probably due to the random nature of the input set reduction process bad outliers in terms of error exist. The figure also reveals, that the $l_0$ norm minimization process significatly reduced the number of support vectors, while it does not lead to a significant increase in training time.
+
+

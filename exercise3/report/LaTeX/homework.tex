@@ -1,6 +1,40 @@
-\section{More de-noising}
-
+\section{Kernel and linear PCA-de-noising on high noise data}
+In this section an extreme noise example is considered, where the human eye has trouble identifying the characters correctly.
+\begin{figure}
+\centering
+\includegraphics[width=0.45\linewidth]{../src/figure/lotsofNoiseKernel}
+\includegraphics[width=0.45\linewidth]{../src/figure/lotsofNoiseLinear}
+\caption{Kernel based and linear pca de-noising of very noise data.}
+\label{fig:lotsofNoise}
+\end{figure}
+Figure~\ref{fig:lotsofNoise} shows the input data as well as the performance of a low sigma kernel-pca in comparison
+to a linear one. The trade off that came with choosing the kernel width $\sigma^2$ was observed earlier. A too large $\sigma^2$
+led to correct predictions but little noise reduction. Smaller width sometimes ended up clear but incorrect letter representations.
+In the case shown in figure~\ref{fig:lotsofNoise} a small $\sigma^2$ had to be chosen in order to deal with the very noisy input.
+Given the low quality of the input the kernel-PCA does an incredibly good job at de-noising. It does confuse 3 with 5 and 6 with 2
+however. In the linear case this does not happen but it does not come close in terms of noise reduction. 
 
 \section{Shuttle dataset-analysis}
+The statlog/shuttle dataset, contains 58000 ten dimensional row data vectors. With the last entry in each row indicating the class to which
+the data point belongs. Traditionally the first 43500 data rows are used for training and the last 14500 data points are retained for testing.
+\begin{figure}
+\centering
+\input{../src/tikz/statlogHist.tex}
+\caption{Histogram of the statlog dataset's training data class distribution.}
+\label{fig:histShuttle}
+\end{figure}
+Figure~\ref{fig:histShuttle} shows the shuttle-dataset's class distribution. About eighty percent of the data belongs to the first class. 
+\begin{figure}
+\centering
+\input{../src/tikz/shuttleError.tex}
+\input{../src/tikz/shuttleSV.tex}
+\input{../src/tikz/shuttleTime.tex}
+\caption{Fixed size svm and $l_0$ svm comparison for classification on the nasa shuttle dataset.}
+\label{fig:shuttle}
+\end{figure}
+A modified version of the \texttt{fslssvm\_script} has been used with the shuttle data set as an input. The aim here is again classification, but its must be noted that the shuttle dataset is much larger than the Wisconsin-cancer set, it has 58000 data points while the cancer set only contains 682 data points. The results of the machine architecture comparison are shown in figure~\ref{fig:shuttle}. On this larger data set the difference in terms of the error estimate become negligible. Quite a significance difference in terms of sparsity persist however, while the training time does not increase significantly. 
+
 
 \section{California dataset-analysis}
+The California housing regression problem.
+

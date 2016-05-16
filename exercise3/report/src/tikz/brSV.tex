@@ -1,0 +1,108 @@
+% This file was created by matlab2tikz.
+% Minimal pgfplots version: 1.3
+%
+%The latest updates can be retrieved from
+%  http://www.mathworks.com/matlabcentral/fileexchange/22022-matlab2tikz
+%where you can also make suggestions and rate matlab2tikz.
+%
+\documentclass[tikz]{standalone}
+\usepackage{pgfplots}
+\usepackage{grffile}
+\pgfplotsset{compat=newest}
+\usetikzlibrary{plotmarks}
+\usepackage{amsmath}
+
+\begin{document}
+\begin{tikzpicture}
+
+\begin{axis}[%
+width=2.5in,
+height=1.5in,
+scale only axis,
+unbounded coords=jump,
+xmin=0.5,
+xmax=2.5,
+xtick={1,2},
+xticklabels={{FS-LSSVM},{SV-$l_0$-norm}},
+ymin=-5.75,
+ymax=164.75,
+ylabel={SV estimate},
+title={Number of Support Vectors}
+]
+\addplot [color=black,dashed,forget plot]
+  table[row sep=crcr]{%
+1	157\\
+1	157\\
+};
+\addplot [color=black,dashed,forget plot]
+  table[row sep=crcr]{%
+2	35\\
+2	46\\
+};
+\addplot [color=black,dashed,forget plot]
+  table[row sep=crcr]{%
+1	157\\
+1	157\\
+};
+\addplot [color=black,dashed,forget plot]
+  table[row sep=crcr]{%
+2	2\\
+2	12\\
+};
+\addplot [color=black,solid,forget plot]
+  table[row sep=crcr]{%
+0.925	157\\
+1.075	157\\
+};
+\addplot [color=black,solid,forget plot]
+  table[row sep=crcr]{%
+1.925	46\\
+2.075	46\\
+};
+\addplot [color=black,solid,forget plot]
+  table[row sep=crcr]{%
+0.925	157\\
+1.075	157\\
+};
+\addplot [color=black,solid,forget plot]
+  table[row sep=crcr]{%
+1.925	2\\
+2.075	2\\
+};
+\addplot [color=blue,solid,forget plot]
+  table[row sep=crcr]{%
+0.85	157\\
+0.85	157\\
+1.15	157\\
+1.15	157\\
+0.85	157\\
+};
+\addplot [color=blue,solid,forget plot]
+  table[row sep=crcr]{%
+1.85	12\\
+1.85	35\\
+2.15	35\\
+2.15	12\\
+1.85	12\\
+};
+\addplot [color=red,solid,forget plot]
+  table[row sep=crcr]{%
+0.85	157\\
+1.15	157\\
+};
+\addplot [color=red,solid,forget plot]
+  table[row sep=crcr]{%
+1.85	20\\
+2.15	20\\
+};
+\addplot [color=black,only marks,mark=+,mark options={solid,draw=red},forget plot]
+  table[row sep=crcr]{%
+nan	nan\\
+};
+\addplot [color=black,only marks,mark=+,mark options={solid,draw=red},forget plot]
+  table[row sep=crcr]{%
+nan	nan\\
+};
+\end{axis}
+\end{tikzpicture}%
+\end{document}
