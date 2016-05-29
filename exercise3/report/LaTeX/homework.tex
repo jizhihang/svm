@@ -36,5 +36,13 @@ A modified version of the \texttt{fslssvm\_script} has been used with the shuttl
 
 
 \section{California dataset-analysis}
-The California housing regression problem.
-
+The California housing regression problem. Using windowed input data with a delay of 1032, which equals a data size to delay ratio of 20. The same ratio has been successfully applied to the Santa-fe estimation problem. The same experiment is repeated for a regression scenario using the California housing data set. 
+\begin{figure}
+\centering
+\input{../src/tikz/calError.tex}
+\input{../src/tikz/calSV.tex}
+\input{../src/tikz/calTime.tex}
+\caption{Fixed size svm and $l_0$ svm comparison for regression on the california-housing dataset.}
+\label{fig:california}
+\end{figure}
+Figure~\ref{fig:california} shows the findings. In this case the a more sparse solution can only be found in some cases. Success in finding a sparse representation probably depends on luck with the random subset the entropy selection method works with.

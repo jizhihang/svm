@@ -1,5 +1,5 @@
 \section{Santa Fe laser Time series prediction}
-The santa fe laser competition data stems from a 1989 paper, physicists measured the intensity of a unidirectional far infrared $NH_3$ laser\footnote{U. H\"{u}bner et al, Dimensions and entropies of chaotic intensity pulsations in a single-mode far-infrared NH3 laser, \url{http://journals.aps.org/pra/pdf/10.1103/PhysRevA.40.6354}}. In physics these types of lasers are modeled using so called Lorenz-Haken models. These models are chaotic systems, whith their Lyapunov exponent determining the speed by which trajectories starting a similar initial conditions diverge. In practice the quality any approximaiton made using Lorenz-Haken models depends on the of the initial conditions and the constants used in the model. 
+The santa fe laser competition data stems from a 1989 paper, physicists measured the intensity of a unidirectional far infrared $NH_3$ laser\footnote{U. H\"{u}bner et al, Dimensions and entropies of chaotic intensity pulsations in a single-mode far-infrared NH3 laser, \url{http://journals.aps.org/pra/pdf/10.1103/PhysRevA.40.6354}}. In physics these types of lasers are modeled using so called Lorenz-Haken models. These models are chaotic systems, with their Lyapunov exponent determining the speed by which trajectories starting at similar initial conditions diverge. In practice the quality any approximation made using Lorenz-Haken models depends on the initial condition and the constants used in the model. 
 \begin{figure}
 \centering
 \includegraphics[scale = 0.25]{../src/figure/origPaper.png}
@@ -7,7 +7,7 @@ The santa fe laser competition data stems from a 1989 paper, physicists measured
 \caption{Data set measured by H\"{u}bner et al. and the subset selected for the Santa Fe competition.}
 \label{fig:origAndSel}
 \end{figure}
-Figure~\ref{fig:origAndSel} shows a screenshot from the original paper and a plot of part of the measurements selected for the santa-fe competition. Instead of trying to figure out a good initial condition as well as reliable parameters for a Lorenz-Haken model a ls-svm in recurrent mode will be used to model this problem.
+Figure~\ref{fig:origAndSel} shows a screen-shot from the original paper and a plot of the part of the measurements selected for the santa-fe competition. Instead of trying to figure out a good initial condition, as well as reliable parameters for a Lorenz-Haken model a ls-svm in recurrent mode will be used to model this problem.
 In the autonomous case of a recurrent model;
 \begin{equation}
 \hat{y}_k = f(\hat{y}_{k-1}, \hat{y}_{k-2}, \hat{y}_{k-3}, \dots)
@@ -21,20 +21,94 @@ The problem states that the approximation error $e_k  = y_k - \hat{y}_k$ should 
 \begin{figure}
 \centering
 \input{../src/tikz/hwautocorr.tex}
-\caption{Autocorrelation analysis of the training time-series shown with 95\% confidence bounds.}
+\input{../src/tikz/santaFe/delayError.tex}
+\caption{Autocorrelation analysis of the training time-series shown with 95\% confidence bounds (left). Training set error using an svm trained using $\gamma = 75.5, \sigma^2 = 27.8$ and a linearly increasing window size.}
 \label{fig:santaFeAutocorr}
 \end{figure}
-In order to choose the window size the sample autocorrelation function shown in figure~\ref{fig:santaFeAutocorr} is considered. In the plot the autocorrelation values start to come close to the confidence bounds around a lag of fifty samples. Therefore a window size of fifty will be used as this shift covers the most significant samples. \\
+In order to choose the window size the sample autocorrelation function shown in figure~\ref{fig:santaFeAutocorr} is considered. In the plot the autocorrelation values start to come close to the confidence bounds around a lag of fifty samples. Therefore a window size of fifty will be used as this shift covers the most significant samples. The plot on the right of figure~\ref{fig:santaFeAutocorr} confirms this choice as reasonable when a window size of fifty samples is reached the error has already fallen over three decades. From fifty to hundred the error falls only by about one more decade. Thus choosing fifty as window size covers the most important part of the information present. \\
 \begin{figure}
 \centering
 \tikzset{mark size=1}
 \input{../src/tikz/hwPredOneSvmWerror2.tex}
 \input{../src/tikz/hwPredOneSvmWerror3_75p5_27p7.tex}
-\caption{Recurrent ls-svm approxmation of scaled Santa-Fee using the automatically found hyper-parameters $\gamma =  158.5795, \sigma^2 = 23.35559$ (top) and $\gamma = 75.4764, \sigma^2 = 27.7826$ (bottom) . The blue curve shows the validation data set, the red one the svm-approximation. Yellow dots indicate the error at any given point.}
+\caption{Recurrent ls-svm approxmation of scaled Santa-Fee using the hyper-parameters $\gamma =  158.5795, \sigma^2 = 23.35559$ (top) and $\gamma = 75.4764, \sigma^2 = 27.7826$ (bottom) found by using 10 fold cross-validation and numerical optimization techniques. The blue curve shows the validation data set, the red one the svm-approximation. Yellow dots indicate the error at any given point.}
 \label{fig:santaFe}
 \end{figure}
- Figure~\ref{fig:santaFe} shows recurrent svm approximation using automatically tuned hyper-parameters found trough a coupled simulated annealing, simplex optimization algorithm pair. Cross-validation was used in order to evaluate the  absolute error cost function. Results using this cost function have been significantly better then using a mean square error function or infinity norm based cost.   
-      
+Figure~\ref{fig:santaFe} shows recurrent svm approximation using automatically tuned hyper-parameters found trough a coupled simulated annealing, simplex optimization algorithm pair. Ten fold cross-validation was used in order to evaluate the  absolute error cost function. Results using this cost function have been significantly better then using a mean square error function or infinity norm based cost. 
+\begin{figure}
+\centering
+\includegraphics[width=0.45\linewidth]{../src/tikz/santaFe/santaFeParamSpace}
+\includegraphics[width=0.45\linewidth]{../src/tikz/santaFe/santaFePredictionError}
+\caption{Plot of 10 fold cross-validation mean squared cost (left) and prediction mean squared error (right) in the hyper-parameter space.}
+\label{fig:santaFeHyperparameterSpace}
+\end{figure}
+A look at figure~\ref{fig:santaFeHyperparameterSpace}, verifies the hyper-parameter choice determined by global optimization. It also reveals that 10 fold cross-validation is a good indicator of prediction performance quality in this case. 
+\begin{figure}
+\centering
+\tikzset{mark size=1}
+\input{../src/tikz/santaFe/baysianSantaFe.tex}
+\caption{Prediction performance using the set of hyperparameters $\{\gamma =  270.0, \sigma^2 = 30\}$ as well as support vectors and bias term found using Bayesian inference.}
+\label{fig:SantaFeBayes}
+\end{figure}
+Another way to obtain a good set of hyper-parameters is using Bayesian inference. Starting from an initial guess of $\gamma = 1000$ and $\sigma^2 = 30$ and improving these values going trough all three layers of inference the parameters $\gamma =  270.0$ and $\sigma^2 = 30$ as well as support vectors and bias term are obtained. The performance of an svm using these values is shown in figure~\ref{fig:SantaFeBayes}.
+
+\section{Lorenz equation estimation}
+In the previous experiment svms where able to predict about 200 samples with reasonable accuracy. But the question remains what happens when more samples are predicted. Will the solution deteriorate or will the svm continue to produce behavior that is characteristic for the dynamical system under consideration?
+In order to answer this question the lorenz-haken data used during the previous experiment is replaced by data from simulating the well known Lorenz equations \footnote{Wikipedia, \url{https://de.wikipedia.org/wiki/Lorenz-Attraktor}} 
+\begin{align}
+\dot{X} &= a(Y - X) \\
+\dot{Y} &= X(b - Z) - Y \\
+\dot{Z} &= XY - cX
+\end{align}
+With the constants $a = 10.0$, $b = 28.0$, and  $c = 8.0/4$. Using the initial condition $(2 \; 1 \; 20)^T$ leads to the solution shown in figure~\ref{fig:lorenz} after Runge-Kutta simulation with a maximum time step of $0.01$, which will serve as a data source.
+\begin{figure}
+\centering
+\input{../src/tikz/lorenz/lorenz.tex}
+\caption{Runge-Kutta (\texttt{ode45}) simulation of lorenz' strange attractor.}
+\label{fig:lorenz}
+\end{figure}
+Before svm training the input data points are flattened into a vector of the form $\mathbf{v}_{\text{in}} = x_1 , y_1, z_1, x_2 , y_2 , \dots$, which is then windowed with a 333 sample sized window. The window size was determined by looking at the autocorrelation function as described before. An svm with parameters
+\begin{figure}
+\centering
+\tikzset{mark size=1}
+\input{../src/tikz/lorenz/lorenzFlatTrain.tex}
+\input{../src/tikz/lorenz/lorenzPred.tex}
+\caption{LS-SVM fit to training data and recurrent prediction results in flattened form. Note how the three dimensionality of the input appears in the error.}
+\label{fig:lorenzFlat}
+\end{figure}
+$\gamma = 100$ and $\sigma^2 = 10$ has been used. The parameters have been determined by trail and error. 
+\begin{figure}
+\centering
+\input{../src/tikz/lorenz/lorenzPred3d.tex}
+\caption{LS-SVM prediction (red) and Runge-Kutta simulation data (blue).}
+\label{fig:lorenzPred3d}
+\end{figure}
+Figure~\ref{fig:lorenzPred3d} shows the evolution of the solution for 3333 flattened data points or 1111 three dimensional points. The start and end of each curve are denoted by a circle and square respectively. The ls-svm prediction does diverge from the Runge-Kutta solution, but continues to exhibit typical Lorenz equation behavior.
+\begin{figure}
+\centering
+\tikzset{mark size=1}
+\input{../src/tikz/lorenz/blorenzFlatTrain.tex}
+\input{../src/tikz/lorenz/blorenzFlatPred.tex}
+\caption{Bayesian inference parameter LS-SVM fit to training data and recurrent prediction results in flattened form. Note how the three dimensionality of the input appears in the error.}
+\label{fig:blorenzFlat}
+\input{../src/tikz/lorenz/blorenzPred3d.tex}
+\caption{Prediction results with Bayesian inference parameters.}
+\label{fig:blorenzPred3d}
+\end{figure}
+Figure~\ref{fig:blorenzFlat} shows the same experiment with an svm trained using $\gamma = 146040$ and $\sigma^2 = 10$, which where found using Bayesian inference. The larger $\gamma$ places lesser emphasis on regularization, which leads to a longer period of accurate prediction, at the cost of an complete breakdown of the prediction process at roughly 1500 flattened samples. 
+
+\subsection{A Lorenz SVM commitee}
+\begin{figure}
+\centering
+\input{../src/tikz/lorenz/autoCorrFlat.tex}
+\input{../src/tikz/lorenz/autocorrX.tex}
+\input{../src/tikz/lorenz/autocorrY.tex}
+\input{../src/tikz/lorenz/autocorrZ.tex}
+\caption{Autocorrelation of the flattened three dimensional as well as x,y and z related training data sets.}
+\label{fig:lorAutocorr}
+\end{figure}
+The comparison of the flattened autocorrelation with the single dimension couterparts shown in figure~\ref{fig:lorAutocorr} reveals that possibly the three dimensions are best treated separately.
+Therefore an attempt to train a Lorenz svm committee-network has been made. One svm per dimension is trained, which means one svm per Lorenz equation. The current version of the \texttt{lssvm toolbox} requires an \texttt{X : N x d matrix with the inputs of the training data} as well as an \texttt{Y : N x 1 vector with the outputs of the training data}. \footnote{LS-SVMlab Toolbox User’s Guide
+version 1.8, K. De Brabanter et al. page 104, \url{http://www.esat.kuleuven.be/sista/lssvmlab/downloads/tutorialv1_8.pdf}} Which means no tensor inputs are allowed. As the columns of the input are required for the windowing a flattened version of the 3 dimensional input has to be used as a workaround. In order to meet the length requirement the unwanted dimensions of the output have been padded with zeros. The flattened predictions have then been added up and reshaped into their original three dimensional form. But unfortunately this approach did not improve results. This is probably due to the fact that zero padding the unwanted output dimensions introduces new false information, from which the Committee-network does not recover. 
 
 
-\section{Changing window committee nets.}

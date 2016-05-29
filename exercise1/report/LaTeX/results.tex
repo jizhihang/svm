@@ -10,7 +10,7 @@ Points far from the decision boundary should not influence the classifier like t
 \begin{figure}
 \input{../src/tikz/initialGaussSvm.tex}
 \input{../src/tikz/initialGaussModSvm.tex}
-\caption{Geometrical construction of a linear classification line using average values.}
+\caption{Linear support vector machine classification.}
 \label{fig:initGaussSvm}
 \end{figure}
 
@@ -25,7 +25,8 @@ The next step is to formulate the optimization problem
 \begin{equation}
 \min_{w,b} \frac{1}{2} \mathbf{w}^T \mathbf{w} \;\text{ such that }\; y_k [\mathbf{w}^T \mathbf{x}_k + b] \geq 1.
 \end{equation}
-Formulating the Lagrange dual, and taking the gradient of $\mathcal{L}(\mathbf{w},b;\alpha)$ with respect to $(\mathbf{w},b)$ leads to a problem in $\alpha$. The lagrange multipliers are called $\alpha$, but in this context they will be called support vectors of the solution. From an optimization point of view, the support vectors are Lagrange multipliers with active set indices. A problem reformulation using a mapping to a high dimensional feature space $\varphi(\mathbf{x}): \mathbb{R}^n \rightarrow \mathbb{R}^m$ as
+Which is the same as asking to maximize the classification margin. This can been seen from rescaling the discriminant function to $\| \mathbf{w}^T \mathbf{x} + b \| = 1$. For separable problems using the fact that $\| \mathbf{w}^T \mathbf{x} + b \| = 0$, on the boundary can be used to express the classification margin to be $\frac{1}{\|\mathbf{w}\|}$. This shows that the optimization problem formulation maximizes the classification margin by minimizing $\mathbf{w}^T \mathbf{w}$.\footnote{Least Squares Support Vector Machines, Suykens et al., page 30} \footnote{Support Vector Machines and Kernels for Computational Biology, Asa Ben-HurAsa et al, page 6}
+Formulating the Lagrange dual, and taking the gradient of $\mathcal{L}(\mathbf{w},b;\alpha)$ with respect to $(\mathbf{w},b)$ leads to a problem in $\alpha$. The Lagrange multipliers are called $\alpha$, if a point $\mathbf{x}_k$ has an associated $\alpha_k > 0$ it is considered a support vector. From an optimization point of view these are points with active set index Lagrange multipliers. A problem reformulation using a mapping to a high dimensional feature space $\varphi(\mathbf{x}): \mathbb{R}^n \rightarrow \mathbb{R}^m$ as
 \begin{equation}
 y_k [\mathbf{w}^T \varphi(\mathbf{x}_k) + b] \geq 1
 \end{equation}
@@ -53,11 +54,11 @@ y_k [\mathbf{w}^T \varphi(\mathbf{x}_k) + b] \geq 1 - \xi_k
 \end{equation}
 Which leads to the optimization problem:
 \begin{align}
-\min_{w,b,\xi} J_p(w,\xi) = \frac{1}{2}\mathbf{w}^T\mathbf{w} + c \sum_{k = 1}^N \xi_k \\
-\text{such that }   y_k [\mathbf{w}^T \varphi(\mathbf{x}_k) + b] \geq 1 - \xi_k, \;\; k = 1,\dots,N \\
-\xi_k \geq 0, \;\;\; k = 1,\dots,N 
+\min_{w,b,\xi} J_p(w,\xi) &= \frac{1}{2}\mathbf{w}^T\mathbf{w} + c \sum_{k = 1}^N \xi_k \\
+\text{such that }   y_k [\mathbf{w}^T \varphi(\mathbf{x}_k) + b] \geq 1 - \xi_k, \;\; k &= 1,\dots,N \\
+\xi_k \geq 0, \;\;\; k &= 1,\dots,N 
 \end{align}
-Where $c$ is the positive real miss-classification penalty constant. High values of $c$ make erroneous classification more costly in terms of the merit function.  Low values make those cheaper. Using the \texttt{svmjs}\footnote{\url{http://cs.stanford.edu/people/karpathy/svmjs/demo/}} package the result of using different values of $c$ is illustrated in figure~\ref{fig:c}. Choosing the right value for $c$ is a balancing act. It is important to choose $c$ not too small. As very small values will result in underfitting the problem. The resulting classifier will ignore important features of the problem, as illustrated on the right in figure~\ref{fig:c}. On the other hand however $c$ must also not be too large. If the penalty on incorrect classification is too large the support machine will start to memorize nosy details, as illustrated in figure~\ref{fig:c} on the left. A good choice like the one shown in the middle captures the key points while not falling prey to the noise, while using just as many support vectors as necessary. 
+Where $c$ is the positive real miss-classification penalty constant. High values of $c$ make erroneous classification more costly in terms of the merit function.  Low values make those cheaper. Using the \texttt{svmjs}\footnote{\url{http://cs.stanford.edu/people/karpathy/svmjs/demo/}} package the result of using different values of $c$ is illustrated in figure~\ref{fig:c}. Choosing the right value for $c$ is a balancing act. It is important to choose $c$ not too small. As very small values will result in underfitting the problem. The resulting classifier will ignore important features of the problem, as illustrated on the right in figure~\ref{fig:c}. On the other hand  $c$ must also not be too large. If the penalty on incorrect classification is too large the support vector machine will start to memorize noisy details, as illustrated in figure~\ref{fig:c} on the left. A good choice like the one shown in the middle captures the key points while not falling prey to the noise, while using just as many support vectors as necessary. 
 \begin{figure}
 \centering
 \includegraphics[width=0.3\linewidth]{../src/figure/overfit}
@@ -66,7 +67,7 @@ Where $c$ is the positive real miss-classification penalty constant. High values
 \caption{The effect of a large miss-classification penalty constant $c$ (left), a good choice for $c$ (middle) and a too small penalty value (right).}
 \label{fig:c}
 \end{figure}
-The effect of changing the kernel density $\sigma$ is explored in figure $\ref{fig:sigma}$. In this case the classification error increase significantly for very small or very large $\sigma$ values. 
+The effect of changing the kernel density $\sigma$ is explored in figure $\ref{fig:sigma}$. In this case the classification error increases significantly for very small or very large $\sigma$ values. 
 \begin{figure}
 \centering
 \includegraphics[width=0.3\linewidth]{../src/figure/sigmaTooSml}
@@ -81,13 +82,18 @@ Like choosing a good $c$ value, when picking $\sigma$ under and over-fitting con
 \centering
 \includegraphics[width=0.33\linewidth]{../src/figure/largeRBF}
 \includegraphics[width=0.33\linewidth]{../src/figure/twoNewPoints}
-\caption{The effect of two additional points on the boundary}
+\caption{The effect of two additional red points on the boundary}
 \label{fig:twoNewPoints}
 \end{figure}
-Figure~\ref{fig:twoNewPoints} illustrates the effect new data points have on the decision boundary. In the right plot two new red points have been added inside of the formerly entirely green region. The decision boundary changes if no additional miss-classification follows from this change. For the new red point close to the green boundary this cannot be done without miss-classifying the green points at the boundary, which therefore has to remain unchanged. 
+Figure~\ref{fig:twoNewPoints} illustrates the effect new data points have on the decision boundary. In the right plot two new red points have been added inside of the formerly entirely green region. The decision boundary changes if no additional miss-classification follows from this change. For the new red point close to the green boundary this cannot be done without miss-classifying the green points at the boundary, which therefore has to remain unchanged. At this point it is also important to note that \footnote{Least Squares Support Vector Machines, Suykens et al., page 32 and 41.}
+\begin{align}
+\mathbf{w} = \sum\limits_{k = 1}^{N} \alpha_k y_k x_x  \text{  (linear)},\\
+\mathbf{w} = \sum\limits_{k = 1}^{N} \alpha_k y_k \varphi (x_k) \text{  (non-linear)}.
+\end{align} 
+Thus not all points contribute equally to the orientation of the decision boundary. In fact only support vectors with $\alpha_k \gg 0$ contribute, for all other points the decision bound hardly changes or remains unchanged, if $\alpha_k = 0$, if the are removed.
 
 \section{Least Squares Support Vector machines}
-In contrast to classical support vector machines, their least squares version is defined as\footnote{Least Squares Support Vector Machines, Suykens et al., page 72.}:
+In contrast to classical support vector machines, their least squares version is defined as:\footnote{Least Squares Support Vector Machines, Suykens et al., page 72.}
 \begin{align}
 \min_{w,b,e} J_p (w,e) &= \frac{1}{2}\mathbf{w}^T\mathbf{w} + \gamma \frac{1}{2} \sum_{k=1}^N e_k^2 \\
 \text{such that } y_k [\mathbf{w}^T \varphi(\mathbf{x_k}) + b] &= 1 - e_k, \; k = 1,\dots,N
@@ -97,7 +103,7 @@ In comparison to the Vapnik formulation the error variable is squared and the co
 y(x) = \text{sign}[\sum_{k = 1}^N \alpha_k y_k K(x,x_k) + b]
 \end{equation}
 is obtained. Least squares support vector machines (LSSVM) are an attempt to reduce the computational load for very large data sets. \\
-In a first experiment the iris data set\footnote{\url{http://archive.ics.uci.edu/ml/datasets/Iris}} is used to test the LSSVM algorithm and learn more about the hyper-parameter space it work well in. The challenge here is to differentiate three types of iris plants \textit{Iris Setosa}, \textit{Iris Versicolour} and \textit{Iris Virginica}, based on the leaf dimensions: sepal length [\texttt{cm}], sepal width [\texttt{cm}], petal length [\texttt{cm}], petal width [\texttt{cm}].
+In a first experiment the iris data set\footnote{\url{http://archive.ics.uci.edu/ml/datasets/Iris}} is used to test the LSSVM algorithm and learn more about the hyper-parameter space it works well in. The challenge here is to differentiate three types of iris plants \textit{Iris Setosa}, \textit{Iris Versicolour} and \textit{Iris Virginica}, based on the leaf dimensions: sepal length [\texttt{cm}], sepal width [\texttt{cm}], petal length [\texttt{cm}], petal width [\texttt{cm}].
 \begin{figure}
 \centering
 \includegraphics[width=0.25\linewidth]{../src/figure/petalSepalUP}
@@ -146,8 +152,8 @@ Polynomial kernels follow the similar pattern. Figure~\ref*{fig:ployDegGamma} re
 
 \subsection{The impact of different validation methods}
 In the previous section the importance of avoiding under- or over-fitting became clear. In this section three different validation methods will be compared. The first procedure randomly splits the one-hundred data points of the simplified iris data set into a twenty point validation and a hundred point training data set. Using the training data a svm is trained and then tested on the validation set. The measured miss-classification using this approach for $\gamma \in [10^{-10},10^{10}]$ and $\sigma \in [10^{-2},10^{2}]$ is shown in figure~\ref{fig:classicClass}. \\
-Cross-validation is a methods which attempts to use a data set more efficiently. During $k$-fold-cross-validation the data set is split into $k$ parts. During the $k$ iterations the methods runs each part is set aside for validation once. A classifier is then trained using the remaining data points. The obtained model can then be tested on the validation part. During the next iteration another part will be ignored during training and so on. Cross validation has the added benefit, that each set serves as a validation set once, which hopefully gives a more complete picture of classification performance. 
-Finally the leave one out method uses all data points except for one to train the classifier. The remaining data point can then be used to evaluate the classifier found. In a next iteration another point is ignored the model is retrained and so on. The leave one out methods is the most conservative in terms of validation set size, but also requires the most computational resources as many iterations are required to get a meaningful idea about the classification performance. 
+Cross-validation is a method which attempts to use a data set more efficiently. During $k$-fold-cross-validation the data set is split into $k$ parts. While the method runs each part is set aside for validation once. A classifier is then trained using the remaining data points. The obtained model can then be tested on the validation part. During the next iteration another part will be ignored during training and so on. Cross validation has the added benefit, that each set serves as a validation set once, which hopefully gives a more complete picture of classification performance. 
+Finally the leave one out method uses all data points except for one to train the classifier. The remaining data point can then be used to evaluate the classifier found. In a next iteration another point is ignored the model is retrained and so on. The leave one out methods is the most conservative in terms of training set size, but also requires the most computational resources as many iterations are required to get a meaningful idea about the classification performance. 
 Figures~\ref{fig:classicClass},~\ref{fig:crossClass} and~\ref{fig:looClass} show the validation results of the three methods using the same parameter ranges. For poor choices of $\sigma$ and $\gamma$, correct classification sinks to about fifty percent, which is as good as classification at random. Generally speaking the 80\% split method is the most data hungry, and it gives an edgy representation of svm performance. Cross validation is more efficient on the data and results are smoother but still follow a similar pattern. The leave one out methods produces an incorrect blue area in the top right for very small $\gamma$ and $\sigma$ values, which does not appear when using other methods. Generally speaking the leave one out methods is suitable for small data-sets due to its computational inefficiency. 
 
 
@@ -166,7 +172,7 @@ Figures~\ref{fig:classicClass},~\ref{fig:crossClass} and~\ref{fig:looClass} show
 
 \subsection{Automatic tuning}
 Using the ls-svm toolbox'\footnote{\url{http://www.esat.kuleuven.be/sista/lssvmlab/}} \texttt{tunesvm} function automatic hyper-parameter selection is explored. Two algorithm pairs are available. The first pair is coupled simulated annealing or randomized directional search. The optimization function can be a simplex-type method or brute force gridsearch. Finally classification cost can be evaluated using $k$-cross-validation or leave-one-out. When choosing a combination a speed or accuracy trade-off has to be made. The fastest but most unstable combination tried during experiments for this report was the randomized directional search coupled with simplex optimization and cross validation. A histogram showing the $\gamma$ and $\sigma$ values found during fifty training processes is shown in figure~\ref{fig:tuneDsSimplexCrossv}.
-A instead of the randomized directional search coupled simulated annealing can be used. Which is not parallelized but the results if finds are more consistent, as can be seen in figure~\ref{fig:tuneCsaSimplexCrossv}. The most stable algorithm combination in terms of predictability was simulated annealing, grid search, leave-one-out validation combination. A histogram with tuning results is shown in figure~\ref{fig:tuneCsaGridLeave}. Only one of fifty iterations produced a large outlier. 
+Instead of the randomized directional search coupled simulated annealing can be used. Which is not parallelized but the results if finds are more consistent, as can be seen in figure~\ref{fig:tuneCsaSimplexCrossv}. The most stable algorithm combination in terms of predictability was a simulated annealing, grid search, leave-one-out validation combination. A histogram with tuning results is shown in figure~\ref{fig:tuneCsaGridLeave}. Only one of fifty iterations produced a large outlier. 
 
 
 \begin{figure}
@@ -208,7 +214,7 @@ Going trough possible decision threshold values the roc-curve is drawn. The area
 \begin{figure}
 \centering
 \input{../src/tikz/roc.tex}
-\caption{}
+\caption{ROC curve of an ideal classifier.}
 \label{fig:roc}
 \end{figure}
 
